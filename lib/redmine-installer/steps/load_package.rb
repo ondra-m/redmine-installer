@@ -1,3 +1,4 @@
+require 'ruby-progressbar'
 require 'fileutils'
 require 'zip'
 require 'tmpdir'
@@ -76,11 +77,15 @@ module Redmine::Installer::Step
 
       def extract_zip
         Zip::File.open(base.redmine) do |zip_file|
+          # Progressbar
+          progressbar = ProgressBar.create(format: '%a |%b>%i| %p%% %t', total: zip_file.size)
+
           zip_file.each do |entry|
             dest_file = File.join(@tmpdir, entry.name)
             FileUtils.mkdir_p(File.dirname(dest_file))
 
             entry.extract(dest_file)
+            progressbar.increment
           end
         end
       end
