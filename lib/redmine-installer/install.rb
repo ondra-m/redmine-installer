@@ -4,7 +4,11 @@ module Redmine::Installer
   class Install < Task
 
     STEPS = [
-      Redmine::Installer::Step::LoadPackage
+      Redmine::Installer::Step::LoadPackage,
+      Redmine::Installer::Step::DatabaseConfig,
+      Redmine::Installer::Step::EmailConfig,
+      Redmine::Installer::Step::Install,
+      Redmine::Installer::Step::WebserverConfig
     ]
 
     attr_accessor :redmine
