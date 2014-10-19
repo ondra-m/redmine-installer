@@ -14,7 +14,17 @@ module Redmine::Installer
       # =======================================================================
       # Generals
 
-      def error(message)
+      def error(*args)
+        # Translate message
+        if args.first.is_a?(Symbol)
+          message = translate(*args)
+        else
+          message = args.first
+        end
+
+        # Colorize message
+        colorize(message)
+
         raise Redmine::Installer::Error, message
       end
 
@@ -30,7 +40,7 @@ module Redmine::Installer
         end
 
         # Colorize message
-        # colorize(message)
+        colorize(message)
 
         $stdout.print(message)
         lines.times { $stdout.puts }
@@ -46,16 +56,14 @@ module Redmine::Installer
       def colorize(text)
         return unless text.is_a?(String)
 
-        key = '([a-zA-Z0-9_]+)'
-
-        text.gsub!(/<#{key}>/) do
+        text.gsub!(/<([a-zA-Z0-9_]+)>/) do
           if ANSI::CHART.has_key?($1.to_sym)
             ANSI.send($1)
           else
             "<#{$1}>"
           end
         end
-        text.gsub!(/<\/#{key}>/) do
+        text.gsub!(/<\/([a-zA-Z0-9_]+)>/) do
           if ANSI::CHART.has_key?($1.to_sym)
             ANSI.clear
           else
@@ -80,7 +88,10 @@ module Redmine::Installer
         if default
           message << " [#{default}]"
         end
-        message << ': '
+
+        if !options[:without_colon]
+          message << ': '
+        end
 
         say(message)
         input = gets
@@ -89,6 +100,30 @@ module Redmine::Installer
         return default if input.empty?
 
         input
+      end
+
+      # User can choose from selection
+      def choose(message, choices, options={})
+        choices = choices.to_a
+        default = options[:default]
+        index = 1
+        choices.each do |(key, message)|
+          if key == default
+            pre = '*'
+          else
+            pre = ' '
+          end
+
+          say(" #{pre}#{index}) #{message}", 1)
+          index += 1
+        end
+        
+        input = ask('> ', without_colon: true).to_i
+
+        # Without default is input 0
+        return default if input.zero? || input > choices.size
+
+        choices[input-1][0]
       end
 
 
