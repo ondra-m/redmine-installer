@@ -12,7 +12,7 @@ module Redmine::Installer
       # Initialize steps for task
       @steps = {}
       index = 1
-      STEP.each do |step|
+      self.class::STEPS.each do |step|
         @steps[index] = step.new(index, self)
         index += 1
       end
