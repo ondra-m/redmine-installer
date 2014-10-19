@@ -5,6 +5,8 @@ gemspec
 
 gem 'gli'
 gem 'i18n'
+gem 'ansi'
+gem 'notifier'
 
 group :development do
   gem 'pry'

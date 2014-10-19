@@ -3,7 +3,7 @@ module Redmine
     autoload :CLI,     'redmine-installer/cli'
     autoload :Task,    'redmine-installer/task'
     autoload :Install, 'redmine-installer/install'
-    autoload :Utils,   'redmine-installer/Utils'
+    autoload :Utils,   'redmine-installer/utils'
 
     # Root of the gem
     def self.root_path

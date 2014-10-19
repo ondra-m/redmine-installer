@@ -93,6 +93,20 @@ module Redmine::Installer
       alias_method :t, :translate
 
 
+      # =======================================================================
+      # Notifications
+
+      def notif(title, message=nil, image=nil)
+        return unless Redmine::Installer.config.notif
+
+        thread = ::Notifier.notify(
+          title: title.to_s,
+          message: message.to_s,
+          image: image.to_s
+        )
+        thread.join
+      end
+
     end # Methods
   end # Utils
 end # Redmine::Installer
