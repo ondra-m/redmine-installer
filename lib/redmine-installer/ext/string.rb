@@ -8,7 +8,8 @@ class String
 
   unless method_defined?(:underscore)
     def underscore
-      gsub(/([A-Z])/){'_'+$1.downcase}
+      self.gsub(/\A([A-Z])/){$1.downcase}
+          .gsub(/([A-Z])/){'_'+$1.downcase}
     end
   end
 end
