@@ -12,7 +12,12 @@ module Redmine::Installer::Step
     end
 
     def print_title
-      say(translate("step.#{self.class.class_name.underscore}.title", index: index), 1)
+      title  = '<bright><on_black><white>'
+      title << translate("step.#{self.class.class_name.underscore}.title", index: index
+        )
+      title <<'</white></on_black></bright>'
+
+      say(title, 1)
     end
 
     def print_header
