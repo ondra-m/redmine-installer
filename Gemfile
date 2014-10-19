@@ -4,6 +4,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'gli'
+gem 'i18n'
 
 group :development do
   gem 'pry'

@@ -27,6 +27,22 @@ module Redmine
       I18n.default_locale = :en
     end
 
+    def self.print_logo
+      $stdout.puts %{#{I18n.t(:welcome_to)}
+                    _             _                     
+     _ __  ___   __| | _ __ ___  (_) _ __    ___        
+    | '__|/ _ \\ / _` || '_ ` _ \\ | || '_ \\  / _ \\ _____ 
+    | |  |  __/| (_| || | | | | || || | | ||  __/|_____|
+    |_|   \\___| \\__,_||_| |_| |_||_||_| |_| \\___|       
+     _              _          _  _             
+    (_) _ __   ___ | |_  __ _ | || |  ___  _ __ 
+    | || '_ \\ / __|| __|/ _` || || | / _ \\| '__|
+    | || | | |\\__ \\| |_| (_| || || ||  __/| |   
+    |_||_| |_||___/ \\__|\\__,_||_||_| \\___||_|  
+
+      }
+    end
+
   end
 end
 
@@ -37,3 +53,4 @@ require 'redmine-installer/version'
 
 # Default configurations
 Redmine::Installer.set_i18n
+Redmine::Installer.print_logo
