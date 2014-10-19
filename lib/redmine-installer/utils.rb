@@ -12,6 +12,14 @@ module Redmine::Installer
     module Methods
 
       # =======================================================================
+      # Generals
+
+      def error(message)
+        raise Redmine::Installer::Error, message
+      end
+
+
+      # =======================================================================
       # Input, output
 
       # Print message to stdout

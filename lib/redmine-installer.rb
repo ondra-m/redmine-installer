@@ -52,6 +52,7 @@ end
 require 'pry'
 require 'i18n'
 require 'redmine-installer/version'
+require 'redmine-installer/error'
 require 'redmine-installer/ext/string'
 require 'redmine-installer/ext/module'
 
