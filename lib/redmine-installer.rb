@@ -51,6 +51,8 @@ end
 require 'pry'
 require 'i18n'
 require 'redmine-installer/version'
+require 'redmine-installer/ext/string'
+require 'redmine-installer/ext/module'
 
 # Default configurations
 Redmine::Installer.set_i18n
