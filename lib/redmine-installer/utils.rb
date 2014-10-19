@@ -29,6 +29,33 @@ module Redmine::Installer
         $stdout.flush
       end
 
+      # Colorize text based on XML marks
+      #
+      # == Examples:
+      #   colorize("<bright><on_black><white>text</white></on_black></bright>")
+      #   # => "\e[1m\e[40m\e[37mtext\e[0m\e[0m\e[0m"
+      #
+      def colorize(text)
+        return unless text.is_a?(String)
+
+        key = '([a-zA-Z0-9_]+)'
+
+        text.gsub!(/<#{key}>/) do
+          if ANSI::CHART.has_key?($1.to_sym)
+            ANSI.send($1)
+          else
+            "<#{$1}>"
+          end
+        end
+        text.gsub!(/<\/#{key}>/) do
+          if ANSI::CHART.has_key?($1.to_sym)
+            ANSI.clear
+          else
+            "</#{$1}>"
+          end
+        end
+      end
+
       # Instead of `super` take only what I need
       def gets
         $stdin.gets.to_s.chomp
