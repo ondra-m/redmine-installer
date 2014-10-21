@@ -36,6 +36,10 @@ module Redmine::Installer
         raise Redmine::Installer::Error, message
       end
 
+      def exec(*args)
+        Redmine::Installer::Exec.new(*args)
+      end
+
 
       # =======================================================================
       # Input, output
