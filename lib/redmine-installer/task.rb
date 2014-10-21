@@ -19,5 +19,9 @@ module Redmine::Installer
       end
     end
 
+    def self.step
+      Redmine::Installer::Step
+    end
+
   end
 end
