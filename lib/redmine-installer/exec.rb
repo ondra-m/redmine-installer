@@ -64,8 +64,11 @@ module Redmine::Installer
         end
       end
 
-      if !@return_value && repeatable && repeat?
-        return run(repeatable)
+      if !@return_value
+        print_error
+        if repeatable && repeat?
+          return run(repeatable)
+        end
       end
 
       return @return_value
@@ -73,18 +76,20 @@ module Redmine::Installer
       stop_timer
     end
 
-    def repeatable_run
-      run
-    rescue => e
-      if confirm(:error_occured_repeat)
-        repeatable_run
-      else
-        # Stop all others command
-        raise Redmine::Installer::Error, e.message
-      end
-    end
-
     private
+
+      def print_error
+        message = '<red>'
+        message << '--------------------------------------------------------------'
+        message << "\n"
+        message << stderr
+        message << '--------------------------------------------------------------'
+        message << '</red>'
+        colorize(message)
+        
+        $stderr.puts(message)
+        $stderr.flush
+      end
 
       def repeat?
         confirm(:do_you_want_repeat_command, false)
