@@ -18,6 +18,10 @@ module Redmine::Installer
         Redmine::Installer::Plugin
       end
 
+      def command
+        Redmine::Installer::Command
+      end
+
       def error(*args)
         # Translate message
         if args.first.is_a?(Symbol)
@@ -128,6 +132,34 @@ module Redmine::Installer
         return default if input.zero? || input > choices.size
 
         choices[input-1][0]
+      end
+
+      def confirm(message, default=true)
+        # Translate message
+        if message.is_a?(Symbol)
+          message = translate(message)
+        end
+
+        # Colorize message
+        colorize(message)
+
+        yes = t(:yes_t)
+        no  = t(:no_t)
+
+        if default
+          yes.upcase!
+        else
+          no.upcase!
+        end
+
+        message << " (#{yes}/#{no}): "
+
+        $stdout.print(message)
+        if gets[0].downcase == yes[0].downcase
+          return true
+        else
+          return false
+        end
       end
 
 
