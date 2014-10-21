@@ -1,11 +1,13 @@
 module Redmine
   module Installer
-    autoload :CLI,     'redmine-installer/cli'
-    autoload :Task,    'redmine-installer/task'
-    autoload :Install, 'redmine-installer/install'
-    autoload :Utils,   'redmine-installer/utils'
-    autoload :Step,    'redmine-installer/step'
+    autoload :CLI,          'redmine-installer/cli'
+    autoload :Task,         'redmine-installer/task'
+    autoload :Install,      'redmine-installer/install'
+    autoload :Utils,        'redmine-installer/utils'
+    autoload :Step,         'redmine-installer/step'
+    autoload :ConfigParams, 'redmine-installer/config_param'
     autoload :Plugin,       'redmine-installer/plugin'
+    autoload :Helper,       'redmine-installer/helper'
 
     # Root of the gem
     def self.root_path
