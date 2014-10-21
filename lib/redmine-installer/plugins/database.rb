@@ -24,8 +24,13 @@ module Redmine::Installer::Plugin
         'production' => data,
         'development' => data,
       }
+      data
+    end
 
-      return DATABASE_YML_PATH, YAML.dump(data)
+    def make_config(redmine_root)
+      File.open(File.join(redmine_root, DATABASE_YML_PATH), 'w') do |f|
+        f.puts(YAML.dump(build))
+      end
     end
 
     class MySQL < Database

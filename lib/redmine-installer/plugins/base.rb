@@ -17,7 +17,7 @@ module Redmine::Installer::Plugin
     end
 
     def self.title
-      translate(self.class_name)
+      translate("plugin.#{self.class_name.downcase}.title")
     end
 
     def self.plugin_name

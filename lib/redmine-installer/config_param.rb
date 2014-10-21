@@ -56,19 +56,20 @@ module Redmine::Installer
     end
 
     attribute :name
+    attribute :note
     attribute :default
     attribute :value
     attribute :ask, true
 
     def initialize(name)
-      set(:name, name)
-
       # Default
       @@attributes.each{|(k,v)| set(k,v)}
+
+      set(:name, name)
     end
 
     # Return string for print
-    def print
+    def title
       out = name.capitalize
       out << " (#{note})" if note
       out
