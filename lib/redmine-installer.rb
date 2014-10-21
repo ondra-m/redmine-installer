@@ -5,6 +5,7 @@ module Redmine
     autoload :Install, 'redmine-installer/install'
     autoload :Utils,   'redmine-installer/utils'
     autoload :Step,    'redmine-installer/step'
+    autoload :Plugin,       'redmine-installer/plugin'
 
     # Root of the gem
     def self.root_path

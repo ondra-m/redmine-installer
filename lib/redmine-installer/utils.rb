@@ -14,6 +14,10 @@ module Redmine::Installer
       # =======================================================================
       # Generals
 
+      def plugin
+        Redmine::Installer::Plugin
+      end
+
       def error(*args)
         # Translate message
         if args.first.is_a?(Symbol)
