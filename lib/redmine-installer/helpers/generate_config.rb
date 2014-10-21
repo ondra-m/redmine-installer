@@ -20,7 +20,7 @@ module Redmine::Installer::Helper
         p.value = ask(p.title, default: p.default)
       end
 
-      instance.make_config(base.redmine_root)
+      instance.make_config(base.tmp_redmine_root)
     end
 
   end

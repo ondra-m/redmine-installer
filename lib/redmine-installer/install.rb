@@ -8,6 +8,7 @@ module Redmine::Installer
       Redmine::Installer::Step::DatabaseConfig,
       Redmine::Installer::Step::EmailConfig,
       Redmine::Installer::Step::Install,
+      Redmine::Installer::Step::MoveRedmine,
       Redmine::Installer::Step::WebserverConfig
     ]
 

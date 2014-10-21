@@ -2,9 +2,10 @@ module Redmine::Installer
   class Task
 
     attr_accessor :redmine_root
+    attr_accessor :tmp_redmine_root
     attr_accessor :options
     attr_accessor :settings
-    
+
     def initialize(options={})
       self.options = options
       self.settings = {}

@@ -18,24 +18,30 @@ module Redmine::Installer::Step
         error :file_must_have_format, file: base.redmine, formats: SUPPORTED_FORMATS.join(', ')
       end
 
+      # Get redmine root
       @redmine_root = ask(:path_for_redmine_root, default: '.')
+      base.redmine_root = @redmine_root
+
+      # Make aboslute path
+      @redmine_root = File.expand_path(@redmine_root)
 
       unless Dir.exist?(@redmine_root)
-        create_redmine_root 
+        create_redmine_root
       end
 
       unless File.writable?(@redmine_root)
         error t(:dir_is_not_writeable, dir: @redmine_root)
       end
 
-      # Make aboslute path
-      @redmine_root = File.expand_path(@redmine_root)
-
       # Make temp directory and extract archive + move it to the redmine_folder
-      extract_and_move_to_redmine_root
+      extract_to_tmp
 
-      base.redmine_root = @redmine_root
-      Dir.chdir(@redmine_root)
+      # Locate redmine_root in tmpdir
+      get_tmp_redmine_root
+      base.tmp_redmine_root = @tmp_redmine_root
+
+      # Change dir to redmine located in tmpdir
+      Dir.chdir(@tmp_redmine_root)
     end
 
     private
@@ -62,16 +68,14 @@ module Redmine::Installer::Step
         end
       end
 
-      def extract_and_move_to_redmine_root
+      def extract_to_tmp
         @tmpdir = Dir.mktmpdir
 
         case @type
         when '.zip'
           extract_zip
         end
-
-        move_to_redmine_root
-      ensure
+      rescue
         FileUtils.remove_entry_secure(@tmpdir)
       end
 
@@ -100,24 +104,24 @@ module Redmine::Installer::Step
       #     `-- config
       # ...
       #
-      def move_to_redmine_root
-        redmine_root = @tmpdir
+      def get_tmp_redmine_root
+        @tmp_redmine_root = @tmpdir
 
         loop {
-          ls = Dir.glob(File.join(redmine_root, '*'))
+          ls = Dir.glob(File.join(@tmp_redmine_root, '*'))
 
           if ls.size == 1
-            redmine_root = ls.first
+            @tmp_redmine_root = ls.first
           else
             break
           end
         }
 
         # Move all files from redmine_root
-        FileUtils.mv(
-          Dir.glob(File.join(redmine_root, '*')),
-          @redmine_root
-        )
+        # FileUtils.mv(
+        #   Dir.glob(File.join(redmine_root, '*')),
+        #   @redmine_root
+        # )
       end
 
   end

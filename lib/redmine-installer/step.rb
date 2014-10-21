@@ -5,6 +5,7 @@ module Redmine::Installer
     autoload :DatabaseConfig,  'redmine-installer/steps/database_config'
     autoload :EmailConfig,     'redmine-installer/steps/email_config'
     autoload :Install,         'redmine-installer/steps/install'
+    autoload :MoveRedmine,     'redmine-installer/steps/move_redmine'
     autoload :WebserverConfig, 'redmine-installer/steps/webserver_config'
   end
 end
