@@ -13,7 +13,8 @@ module Redmine::Installer::Step
 
     def print_title
       title  = '<bright><on_black><white>'
-      title << translate("step.#{self.class.class_name.underscore}.title", index: index
+      title << "#{index}. "
+      title << translate("step.#{self.class.class_name.underscore}.title"
         )
       title <<'</white></on_black></bright>'
 

@@ -25,6 +25,7 @@ module Redmine::Installer
         step.print_header
         step.up
         step.print_footer
+        puts
       end
     end
 
