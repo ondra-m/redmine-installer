@@ -1,5 +1,3 @@
-require 'tempfile'
-
 module Redmine::Installer
   class Install < Task
 

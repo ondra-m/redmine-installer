@@ -40,6 +40,14 @@ module Redmine::Installer
         Redmine::Installer::Exec.new(*args)
       end
 
+      def run_command(command, title)
+        executing = exec(command).with_title(title)
+
+        unless executing.run(true)
+          error(executing.stderr)
+        end
+      end
+
 
       # =======================================================================
       # Input, output
