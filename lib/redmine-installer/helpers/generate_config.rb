@@ -15,7 +15,7 @@ module Redmine::Installer::Helper
 
       instance = answer.new
 
-      say("(#{instance.class.name})", 2)
+      say("(#{instance.class.title})", 2)
       instance.params.for_asking.each do |p|
         p.value = ask(p.title, default: p.default)
       end
