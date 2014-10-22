@@ -13,14 +13,11 @@ module Redmine::Installer::Step
       # Skip
       return if answer.nil?
 
-      instance = answer.new
+      say("(#{answer.title  })", 2)
 
-      say("(#{instance.class.title})", 2)
-
-      puts '============================================== ', 2
+      puts '=============================================='
       say  answer.generate_config(base.redmine_root)
-      puts # new line
-      puts '============================================== ', 2
+      puts '=============================================='
     end
 
   end

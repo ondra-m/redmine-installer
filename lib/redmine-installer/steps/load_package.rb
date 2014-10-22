@@ -39,6 +39,7 @@ module Redmine::Installer::Step
       # Locate redmine_root in tmpdir
       get_tmp_redmine_root
       base.tmp_redmine_root = @tmp_redmine_root
+      base.settings[:tmpdir] = @tmpdir
 
       # Change dir to redmine located in tmpdir
       Dir.chdir(@tmp_redmine_root)

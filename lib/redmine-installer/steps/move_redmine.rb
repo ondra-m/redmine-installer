@@ -11,10 +11,10 @@ module Redmine::Installer::Step
       )
 
       # Delete tmp_redmine_root
-      FileUtils.remove_entry_secure(base.tmp_redmine_root)
+      FileUtils.remove_entry_secure(base.settings[:tmpdir])
 
       # Change dir to redmine_root
-      Dir.chdir(base.tmp_redmine_roott)
+      Dir.chdir(base.redmine_root)
     end
 
   end
