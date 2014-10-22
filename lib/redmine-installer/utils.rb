@@ -159,7 +159,7 @@ module Redmine::Installer
         message << " (#{yes}/#{no}): "
 
         $stdout.print(message)
-        if gets[0].downcase == yes[0].downcase
+        if gets[0].to_s.downcase == yes[0].downcase
           return true
         else
           return false
