@@ -20,10 +20,10 @@ module Redmine::Installer::Step
 
       # Get redmine root
       @redmine_root = ask(:path_for_redmine_root, default: '.')
-      base.redmine_root = @redmine_root
 
       # Make aboslute path
       @redmine_root = File.expand_path(@redmine_root)
+      base.redmine_root = @redmine_root
 
       unless Dir.exist?(@redmine_root)
         create_redmine_root
@@ -116,12 +116,6 @@ module Redmine::Installer::Step
             break
           end
         }
-
-        # Move all files from redmine_root
-        # FileUtils.mv(
-        #   Dir.glob(File.join(redmine_root, '*')),
-        #   @redmine_root
-        # )
       end
 
   end
