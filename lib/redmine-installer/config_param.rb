@@ -79,5 +79,12 @@ module Redmine::Installer
       self.send("#{key}=", value)
     end
 
+    def default(value=nil)
+      return @default if value.nil?
+
+      self.default = value
+      self.value = value if self.value.nil?
+    end
+
   end
 end
