@@ -2,8 +2,8 @@ module Redmine::Installer
   class Upgrade < Task
 
     STEPS = [
-
       step::LoadPackage,
+      step::Validation,
     ]
 
     attr_accessor :package
@@ -11,8 +11,6 @@ module Redmine::Installer
     def initialize(package, options={})
       self.package = package
       super(options)
-
-      binding.pry unless @__binding
     end
 
     def run
