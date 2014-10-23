@@ -19,6 +19,20 @@ module Redmine::Installer
       end
     end
 
+    def run
+      @steps.each do |id, step|
+        step.print_title
+        step.print_header
+        step.up
+        step.print_footer
+        puts
+      end
+
+      @steps.each do |id, step|
+        step.final_step
+      end
+    end
+
     def self.step
       Redmine::Installer::Step
     end

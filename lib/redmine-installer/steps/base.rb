@@ -27,6 +27,9 @@ module Redmine::Installer::Step
     def print_footer
     end
 
+    def final_step
+    end
+
     def up
     end
 
