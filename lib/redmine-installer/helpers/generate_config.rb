@@ -8,7 +8,8 @@ module Redmine::Installer::Helper
       end
       choices[nil] = t(:skip)
 
-      answer = choose(:"what_#{type.class_name.downcase}_do_you_want", choices, default: nil)
+      # answer = choose(:"what_#{type.class_name.downcase}_do_you_want", choices, default: nil)
+      answer = choose(nil, choices, default: nil)
 
       # Skip
       return if answer.nil?

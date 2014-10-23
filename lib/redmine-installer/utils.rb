@@ -127,6 +127,8 @@ module Redmine::Installer
         choices = choices.to_a
         default = options[:default]
         index = 1
+
+        say(message, 1) unless message.nil?
         choices.each do |(key, message)|
           if key == default
             pre = '*'
@@ -137,8 +139,9 @@ module Redmine::Installer
           say(" #{pre}#{index}) #{message}", 1)
           index += 1
         end
-        
+
         input = ask('> ', without_colon: true).to_i
+        puts
 
         # Without default is input 0
         return default if input.zero? || input > choices.size

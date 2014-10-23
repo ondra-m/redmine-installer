@@ -8,5 +8,6 @@ module Redmine::Installer
     autoload :MoveRedmine,     'redmine-installer/steps/move_redmine'
     autoload :WebserverConfig, 'redmine-installer/steps/webserver_config'
     autoload :Validation,      'redmine-installer/steps/validation'
+    autoload :BackUp,          'redmine-installer/steps/back_up'
   end
 end
