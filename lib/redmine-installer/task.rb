@@ -6,6 +6,8 @@ module Redmine::Installer
     attr_accessor :options
     attr_accessor :settings
 
+    attr_reader :steps
+
     def initialize(options={})
       self.options = options
       self.settings = {}

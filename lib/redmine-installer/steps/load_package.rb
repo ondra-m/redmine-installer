@@ -45,6 +45,10 @@ module Redmine::Installer::Step
       Dir.chdir(@tmp_redmine_root)
     end
 
+    def save(configuration)
+      configuration['redmine_root'] = @redmine_root
+    end
+
     private
 
       def extract_to_tmp

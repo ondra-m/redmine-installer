@@ -6,8 +6,7 @@ module Redmine::Installer
       step::Validation,
       step::BackUp,
       step::Upgrade,
-      step::MoveRedmine,
-      step::SaveProfile
+      step::MoveRedmine
     ]
 
     attr_accessor :package
@@ -16,6 +15,11 @@ module Redmine::Installer
     def initialize(package, options={})
       self.package = package
       super(options)
+    end
+
+    def run
+      super
+      Redmine::Installer::Profile.save(self)
     end
 
   end

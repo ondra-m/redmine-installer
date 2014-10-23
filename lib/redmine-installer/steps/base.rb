@@ -36,6 +36,9 @@ module Redmine::Installer::Step
     def down
     end
 
+    def save(configuration)
+    end
+
     def redmine_plugins
       @redmine_plugins ||= _redmine_plugins
     end

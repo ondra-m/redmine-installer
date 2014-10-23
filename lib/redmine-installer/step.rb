@@ -10,6 +10,5 @@ module Redmine::Installer
     autoload :Validation,      'redmine-installer/steps/validation'
     autoload :BackUp,          'redmine-installer/steps/back_up'
     autoload :Upgrade,         'redmine-installer/steps/upgrade'
-    autoload :SaveProfile,     'redmine-installer/steps/save_profile'
   end
 end
