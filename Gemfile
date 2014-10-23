@@ -7,6 +7,7 @@ gem 'gli'
 gem 'i18n'
 gem 'ansi'
 gem 'notifier'
+gem 'ruby-progressbar'
 
 group :development do
   gem 'pry'

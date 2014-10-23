@@ -18,5 +18,9 @@ module Redmine::Installer::Step
       Dir.chdir(base.redmine_root)
     end
 
+    def print_footer
+      say '<green>... OK</green>', 1
+    end
+
   end
 end
