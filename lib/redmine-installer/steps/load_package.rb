@@ -47,8 +47,6 @@ module Redmine::Installer::Step
 
     private
 
-
-
       def extract_to_tmp
         @tmpdir = Dir.mktmpdir
 

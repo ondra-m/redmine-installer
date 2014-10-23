@@ -4,7 +4,8 @@ module Redmine::Installer
     STEPS = [
       step::LoadPackage,
       step::Validation,
-      step::BackUp
+      step::BackUp,
+      step::Upgrade
     ]
 
     attr_accessor :package

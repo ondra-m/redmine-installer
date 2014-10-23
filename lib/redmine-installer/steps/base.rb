@@ -33,5 +33,17 @@ module Redmine::Installer::Step
     def down
     end
 
+    def redmine_plugins
+      @redmine_plugins ||= _redmine_plugins
+    end
+
+    private
+
+      def _redmine_plugins
+        Dir.glob(File.join(base.redmine_root, 'plugins', '*')).select do |entry|
+          File.directory?(entry)
+        end
+      end
+
   end
 end
