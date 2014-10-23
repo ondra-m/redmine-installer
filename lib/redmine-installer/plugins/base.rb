@@ -20,9 +20,9 @@ module Redmine::Installer::Plugin
       translate("plugin.#{self.superclass.class_name.downcase}.#{self.class_name.downcase}.title")
     end
 
-    def self.plugin_name
-      binding.pry unless @__binding
-    end
+    # def self.plugin_name
+    #   binding.pry unless @__binding
+    # end
 
   end
 end

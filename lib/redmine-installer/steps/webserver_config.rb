@@ -13,11 +13,9 @@ module Redmine::Installer::Step
       # Skip
       return if answer.nil?
 
-      say("(#{answer.title  })", 2)
+      say("(#{answer.title  })", 5)
 
-      puts '=============================================='
-      say  answer.generate_config(base.redmine_root)
-      puts '=============================================='
+      say(answer.generate_config(base.redmine_root))
     end
 
   end
