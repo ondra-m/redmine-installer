@@ -20,6 +20,10 @@ module Redmine::Installer::Plugin
           run_command(RAKE_EASYPROJECT_INSTALL, t('plugin.redmine_plugin.easyproject.install'))
         end
       end
+
+      def self.upgrade
+        install
+      end
     end
 
   end

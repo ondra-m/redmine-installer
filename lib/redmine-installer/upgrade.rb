@@ -5,7 +5,8 @@ module Redmine::Installer
       step::LoadPackage,
       step::Validation,
       step::BackUp,
-      step::Upgrade
+      step::Upgrade,
+      step::MoveRedmine
     ]
 
     attr_accessor :package
