@@ -21,7 +21,7 @@ module Redmine::Installer
       # end
 
       desc "Install redmine from package"
-      arg :redmine
+      arg :package
       command [:i, :install] do |c|
         c.action do |global_options, options, args|
           r_installer = Redmine::Installer::Install.new(args.first, global_options.merge(options))
@@ -31,8 +31,8 @@ module Redmine::Installer
 
       desc "Upgrade redmine from package"
       arg :package
-      arg :redmine_root
       command [:u, :upgrade] do |c|
+        c.flag [:p, :profile]
         c.action do |global_options, options, args|
           r_upgrader = Redmine::Installer::Upgrade.new(args.first, global_options.merge(options))
           r_upgrader.run

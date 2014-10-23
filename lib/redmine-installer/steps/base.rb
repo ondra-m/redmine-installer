@@ -36,7 +36,10 @@ module Redmine::Installer::Step
     def down
     end
 
-    def save(configuration)
+    def save(*)
+    end
+
+    def load(*)
     end
 
     def redmine_plugins

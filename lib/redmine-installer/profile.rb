@@ -18,6 +18,11 @@ module Redmine::Installer
       say t(:your_profile_can_be_used_as, id: profile.id), 2
     end
 
+    def self.load(task, id)
+      profile = Profile.new(task)
+      profile.load(id)
+    end
+
     def self.check_writable
       FileUtils.touch(CONFIG_FILE)
       File.writable?(CONFIG_FILE)
@@ -29,14 +34,14 @@ module Redmine::Installer
       self.task = task
 
       # Load profiles
-      @data = YAML.load_file(CONFIG_FILE)
+      @data = YAML.load_file(CONFIG_FILE) rescue nil
 
       # Make empty Hash if there is no profiles
       @data = {} unless @data.is_a?(Hash)
     end
 
-    def id
-      @id ||= @data.keys.max.to_i + 1
+    def next_id
+      @next_id ||= @data.keys.max.to_i + 1
     end
 
     def save
@@ -46,9 +51,19 @@ module Redmine::Installer
         step.save(configuration)
       end
       
-      @data[id] = configuration
+      @data[next_id] = configuration
 
       File.open(CONFIG_FILE, 'w') {|f| f.puts(YAML.dump(@data))}
+    end
+
+    def load(id)
+      @id = id
+
+      configuration = @data[id.to_i] || {}
+
+      task.steps.each do |_, step|
+        step.load(configuration)
+      end
     end
 
   end

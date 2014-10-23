@@ -19,7 +19,7 @@ module Redmine::Installer::Step
       end
 
       # Get redmine root
-      @redmine_root = ask(:path_for_redmine_root, default: '.')
+      @redmine_root ||= ask(:path_for_redmine_root, default: '.')
 
       # Make aboslute path
       @redmine_root = File.expand_path(@redmine_root)
@@ -47,6 +47,10 @@ module Redmine::Installer::Step
 
     def save(configuration)
       configuration['redmine_root'] = @redmine_root
+    end
+
+    def load(configuration)
+      @redmine_root = configuration['redmine_root']
     end
 
     private

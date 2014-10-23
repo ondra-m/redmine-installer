@@ -18,6 +18,7 @@ module Redmine::Installer
     end
 
     def run
+      Redmine::Installer::Profile.load(self, options[:profile])
       super
       Redmine::Installer::Profile.save(self)
     end
