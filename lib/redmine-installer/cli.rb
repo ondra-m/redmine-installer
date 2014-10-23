@@ -34,7 +34,7 @@ module Redmine::Installer
       arg :redmine_root
       command [:u, :upgrade] do |c|
         c.action do |global_options, options, args|
-          r_upgrader = Redmine::Installer::Upgrade.new(args[0], args[1], global_options.merge(options))
+          r_upgrader = Redmine::Installer::Upgrade.new(args.first, global_options.merge(options))
           r_upgrader.run
         end
       end

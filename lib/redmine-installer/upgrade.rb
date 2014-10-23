@@ -3,13 +3,13 @@ module Redmine::Installer
 
     STEPS = [
 
+      step::LoadPackage,
     ]
 
     attr_accessor :package
 
-    def initialize(package, redmine_root, options={})
+    def initialize(package, options={})
       self.package = package
-      self.redmine_root = redmine_root
       super(options)
 
       binding.pry unless @__binding

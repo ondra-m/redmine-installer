@@ -10,10 +10,10 @@ module Redmine::Installer
       step::WebserverConfig
     ]
 
-    attr_accessor :redmine
+    attr_accessor :package
 
-    def initialize(redmine, options={})
-      self.redmine = redmine
+    def initialize(package, options={})
+      self.package = package
       super(options)
     end
 

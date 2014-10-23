@@ -9,13 +9,13 @@ module Redmine::Installer::Step
     SUPPORTED_FORMATS = ['.zip']
 
     def up
-      unless File.exist?(base.redmine)
-        error :file_not_exist, file: base.redmine
+      unless File.exist?(base.package)
+        error :file_not_exist, file: base.package
       end
 
-      @type = File.extname(base.redmine)
+      @type = File.extname(base.package)
       unless SUPPORTED_FORMATS.include?(@type)
-        error :file_must_have_format, file: base.redmine, formats: SUPPORTED_FORMATS.join(', ')
+        error :file_must_have_format, file: base.package, formats: SUPPORTED_FORMATS.join(', ')
       end
 
       # Get redmine root
@@ -81,7 +81,7 @@ module Redmine::Installer::Step
       end
 
       def extract_zip
-        Zip::File.open(base.redmine) do |zip_file|
+        Zip::File.open(base.package) do |zip_file|
           # Progressbar
           progressbar = ProgressBar.create(format: '%a |%b>%i| %p%% %t', total: zip_file.size)
 
