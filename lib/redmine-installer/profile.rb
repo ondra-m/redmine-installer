@@ -40,8 +40,8 @@ module Redmine::Installer
       @data = {} unless @data.is_a?(Hash)
     end
 
-    def next_id
-      @next_id ||= @data.keys.max.to_i + 1
+    def id
+      @id ||= @data.keys.map(&:to_i).max.to_i + 1
     end
 
     def save
@@ -50,16 +50,18 @@ module Redmine::Installer
       task.steps.each do |_, step|
         step.save(configuration)
       end
-      
-      @data[next_id] = configuration
+
+      @data[id] = configuration
 
       File.open(CONFIG_FILE, 'w') {|f| f.puts(YAML.dump(@data))}
     end
 
     def load(id)
-      @id = id
+      @id = id.to_i
 
-      configuration = @data[id.to_i] || {}
+      configuration = @data[@id]
+
+      return if configuration.nil?
 
       task.steps.each do |_, step|
         step.load(configuration)

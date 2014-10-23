@@ -20,7 +20,7 @@ module Redmine::Installer
     def run
       Redmine::Installer::Profile.load(self, options[:profile])
       super
-      Redmine::Installer::Profile.save(self)
+      Redmine::Installer::Profile.save(self) if options[:profile].nil?
     end
 
   end

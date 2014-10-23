@@ -13,9 +13,9 @@ module Redmine::Installer::Step
       choices[:only_database] = t(:only_database)
       choices[:skip] = t(:skip)
 
-      answer = choose(:do_you_want_backup_redmine, choices, default: :backup)
+      @backup_type ||= choose(:do_you_want_backup_redmine, choices, default: :backup)
 
-      case answer
+      case @backup_type
       when :full_backup
         do_full_backup
       when :backup
@@ -29,6 +29,16 @@ module Redmine::Installer::Step
       if @current_backup_dir
         say t(:backup_is_stored_at, dir: @current_backup_dir), 2
       end
+    end
+
+    def save(configuration)
+      configuration['backup_type'] = @backup_type
+      configuration['backup_dir'] = base.backup_dir
+    end
+
+    def load(configuration)
+      @backup_type = configuration['backup_type']
+      base.backup_dir = configuration['backup_dir']
     end
 
     private
