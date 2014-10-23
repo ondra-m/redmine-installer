@@ -12,7 +12,7 @@ module Redmine::Installer
       program_desc spec.summary
       version Redmine::Installer::VERSION
 
-      desc "Show verbose output"
+      desc I18n.transalte(:cli_show_verbose_output)
       default_value false
       switch [:d, :debug], negatable: false
 
@@ -20,7 +20,7 @@ module Redmine::Installer
       #   $verbose = global_options[:debug]
       # end
 
-      desc "Install redmine from package"
+      desc I18n.transalte(:cli_install_desc)
       arg :package
       command [:i, :install] do |c|
         c.action do |global_options, options, args|
@@ -29,7 +29,7 @@ module Redmine::Installer
         end
       end
 
-      desc "Upgrade redmine from package"
+      desc I18n.transalte(:cli_upgrade_desc)
       arg :package
       command [:u, :upgrade] do |c|
         c.flag [:p, :profile]
