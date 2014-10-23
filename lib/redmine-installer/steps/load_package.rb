@@ -26,7 +26,7 @@ module Redmine::Installer::Step
       base.redmine_root = @redmine_root
 
       unless Dir.exist?(@redmine_root)
-        create_redmine_root
+        try_create_dir(@redmine_root)
       end
 
       unless File.writable?(@redmine_root)
@@ -47,27 +47,7 @@ module Redmine::Installer::Step
 
     private
 
-      # Try create a redmine_root dir
-      # When mkdir raise an error (permission problem) method
-      # ask user if wants exist or try again
-      def create_redmine_root
-        begin
-          FileUtils.mkdir_p(@redmine_root)
-        rescue
-          choices = {}
-          choices[:exit] = t(:exit)
-          choices[:try_again] = t(:try_again)
 
-          answer = choose(:redmine_root_not_exist_and_cannot_be_created, choices, default: :exit)
-
-          case answer
-          when :exit
-            exit
-          when :try_again
-            create_redmine_root
-          end
-        end
-      end
 
       def extract_to_tmp
         @tmpdir = Dir.mktmpdir

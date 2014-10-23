@@ -1,3 +1,4 @@
+require 'fileutils'
 require 'notifier'
 require 'ansi'
 
@@ -48,6 +49,27 @@ module Redmine::Installer
         end
       end
 
+      # Try create a dir
+      # When mkdir raise an error (permission problem) method
+      # ask user if wants exist or try again
+      def try_create_dir(dir)
+        begin
+          FileUtils.mkdir_p(dir)
+        rescue
+          choices = {}
+          choices[:exit] = t(:exit)
+          choices[:try_again] = t(:try_again)
+
+          answer = choose(t(:dir_not_exist_and_cannot_be_created, dir: dir), choices, default: :exit)
+
+          case answer
+          when :exit
+            error ''
+          when :try_again
+            try_create_dir(dir)
+          end
+        end
+      end
 
       # =======================================================================
       # Input, output
