@@ -66,7 +66,7 @@ module Redmine::Installer::Step
         FileUtils.cp_r(File.join(base.redmine_root, 'files'), @current_backup_dir)
 
         # database dump
-        plugin::Database.load(base.redmine_root).backup(@current_backup_dir)
+        plugin::Database.backup_all(base.redmine_root, @current_backup_dir)
       end
 
   end

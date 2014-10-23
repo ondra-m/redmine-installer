@@ -1,9 +1,29 @@
+require 'yaml'
+
 module Redmine::Installer::Plugin
   class Database < Base
-    
+
     DATABASE_YML_PATH = 'config/database.yml'
+    DATABASE_BACKUP_DIR = '__database'
 
     attr_reader :params
+
+    def self.backup_all(redmine_root, backup_dir)
+      database_file = File.join(redmine_root, DATABASE_YML_PATH)
+      return unless File.exist?(database_file)
+
+      definitions = YAML.load_file(database_file)
+      definitions.each do |name, data|
+
+        klass = all.detect{|klass| klass.adapter_name == data['adapter']}
+
+        next if klass.nil?
+
+        klass = klass.new
+        klass.load(data)
+        klass.backup(backup_dir)
+      end
+    end
 
     def initialize
       @params = Redmine::Installer::ConfigParams.new
@@ -19,12 +39,26 @@ module Redmine::Installer::Plugin
     # with the same parameters.
     def build
       data = Hash[@params.map{|p| [p.name, p.value]}]
-      data['adapter'] = self.adapter_name
+      data['adapter'] = self.class.adapter_name
       data = {
         'production' => data,
         'development' => data,
       }
       data
+    end
+
+    # Load paramaters for connection
+    def load(data)
+      data.each do |name, value|
+        # Get param
+        param = @params[name]
+
+        # Unsupported key or unnecessary parameter
+        next if param.nil?
+
+        # Save value
+        param.value = value
+      end
     end
 
     def make_config(redmine_root)
@@ -33,15 +67,48 @@ module Redmine::Installer::Plugin
       end
     end
 
+    def file_for_backup(dir)
+      FileUtils.mkdir_p(File.join(dir, DATABASE_BACKUP_DIR))
+      File.join(dir, DATABASE_BACKUP_DIR, "#{self.class.adapter_name}_#{params['database'].value}.dump")
+    end
+
+    def backup(dir)
+      file = file_for_backup(dir)
+
+      # More enviroments can use the same database
+      return if File.exist?(file)
+
+      Kernel.system(command_for_backup(file))
+    end
+
+
     class MySQL < Database
-      def adapter_name
+      def self.adapter_name
         'mysql2'
+      end
+
+      def initialize
+        super
+        @params.add('port').default(3306)
+      end
+
+      def command_for_backup(file)
+        "mysqldump -h #{params['host'].value} -P #{params['port'].value} -u #{params['username'].value} -p#{params['password'].value} #{params['database'].value} > #{file}"
       end
     end
 
     class PostgreSQL < Database
-      def adapter_name
+      def self.adapter_name
         'pg'
+      end
+
+      def initialize
+        super
+        @params.add('port').default(5432)
+      end
+
+      def command_for_backup(file)
+        %{PGPASSWORD="#{params['password'].value}" pg_dump -i -h #{params['host'].value} -p #{params['port'].value} -U #{params['username'].value} -Fc -f #{file}}
       end
     end
 
