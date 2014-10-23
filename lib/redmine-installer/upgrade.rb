@@ -4,9 +4,11 @@ module Redmine::Installer
     STEPS = [
       step::LoadPackage,
       step::Validation,
+      step::BackUp
     ]
 
     attr_accessor :package
+    attr_accessor :backup_dir
 
     def initialize(package, options={})
       self.package = package
