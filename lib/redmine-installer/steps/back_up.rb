@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'zip'
 
 module Redmine::Installer::Step
   class BackUp < Base
@@ -9,6 +10,7 @@ module Redmine::Installer::Step
       choices = {}
       choices[:full_backup] = t(:full_backup)
       choices[:backup] = t(:backup)
+      choices[:only_database] = t(:only_database)
       choices[:skip] = t(:skip)
 
       answer = choose(:do_you_want_backup_redmine, choices, default: :backup)
@@ -18,9 +20,9 @@ module Redmine::Installer::Step
         do_full_backup
       when :backup
         do_backup
+      when :only_database
+        database_backup
       end
-
-      binding.pry unless @__binding
     end
 
     private
@@ -41,9 +43,27 @@ module Redmine::Installer::Step
         try_create_dir(@current_backup_dir)
       end
 
+      def database_backup
+        plugin::Database.backup_all(base.redmine_root, @current_backup_dir)
+      end
+
       def do_full_backup
         check_backup_dir
         create_current_backup_dir
+
+        zipfile_name = File.join(@current_backup_dir, 'redmine.zip')
+
+        Dir.chdir(base.redmine_root) do
+          Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+            Dir.glob(File.join('**', '{*,.*}')).each do |entry|
+              next if entry.end_with?('.') || entry.end_with?('..')
+
+              zipfile.add(entry, entry)
+            end
+          end
+        end
+
+        database_backup
       end
 
       def do_backup
@@ -65,8 +85,7 @@ module Redmine::Installer::Step
         # files
         FileUtils.cp_r(File.join(base.redmine_root, 'files'), @current_backup_dir)
 
-        # database dump
-        plugin::Database.backup_all(base.redmine_root, @current_backup_dir)
+        database_backup
       end
 
   end
