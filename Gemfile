@@ -12,6 +12,8 @@ gem 'ruby-progressbar'
 group :development do
   gem 'pry'
   gem 'rspec'
+  gem 'rspec-mocks'
   gem 'guard'
   gem 'guard-rspec'
+  gem 'rest_client'
 end
