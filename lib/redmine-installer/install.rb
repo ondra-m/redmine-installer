@@ -2,6 +2,7 @@ module Redmine::Installer
   class Install < Task
 
     STEPS = [
+      step::RedmineRoot,
       step::LoadPackage,
       step::DatabaseConfig,
       step::EmailConfig,

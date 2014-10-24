@@ -2,6 +2,7 @@ module Redmine::Installer
   class Upgrade < Task
 
     STEPS = [
+      step::RedmineRoot,
       step::LoadPackage,
       step::Validation,
       step::Backup,
