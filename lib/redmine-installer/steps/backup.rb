@@ -2,7 +2,7 @@ require 'fileutils'
 require 'zip'
 
 module Redmine::Installer::Step
-  class BackUp < Base
+  class Backup < Base
 
     DEFAULT_BACKUP_DIR = File.join(Dir.home, 'redmine-backups')
 

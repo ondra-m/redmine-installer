@@ -42,8 +42,8 @@ en:
       title: 'Webserve configuration'
     validation:
       title: 'Validation'
-    back_up:
-      title: 'Back-up'
+    backup:
+      title: 'Backup'
     upgrade:
       title: 'Upgrading'
     save_profile:

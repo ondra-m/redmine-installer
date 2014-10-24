@@ -39,6 +39,15 @@ module Redmine::Installer
         end
       end
 
+      desc I18n.translate(:cli_backup_desc)
+      command [:b, :backup] do |c|
+        c.flag [:p, :profile]
+        c.action do |global_options, options, args|
+          r_upgrader = Redmine::Installer::Backup.new(args.first, global_options.merge(options))
+          r_upgrader.run
+        end
+      end
+
       run(argv)
     end
 

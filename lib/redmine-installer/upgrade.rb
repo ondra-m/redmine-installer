@@ -4,7 +4,7 @@ module Redmine::Installer
     STEPS = [
       step::LoadPackage,
       step::Validation,
-      step::BackUp,
+      step::Backup,
       step::Upgrade,
       step::MoveRedmine
     ]
