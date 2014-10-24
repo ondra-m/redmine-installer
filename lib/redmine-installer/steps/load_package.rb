@@ -19,18 +19,17 @@ module Redmine::Installer::Step
       end
 
       # Get redmine root
-      @redmine_root ||= ask(:path_for_redmine_root, default: '.')
+      base.redmine_root ||= ask(:path_for_redmine_root, default: '.')
 
-      # Make aboslute path
-      @redmine_root = File.expand_path(@redmine_root)
-      base.redmine_root = @redmine_root
+      # Make absolute path
+      base.redmine_root = File.expand_path(base.redmine_root)
 
-      unless Dir.exist?(@redmine_root)
-        try_create_dir(@redmine_root)
+      unless Dir.exist?(base.redmine_root)
+        try_create_dir(base.redmine_root)
       end
 
-      unless File.writable?(@redmine_root)
-        error t(:dir_is_not_writeable, dir: @redmine_root)
+      unless File.writable?(base.redmine_root)
+        error t(:dir_is_not_writeable, dir: base.redmine_root)
       end
 
       # Make temp directory and extract archive + move it to the redmine_folder
@@ -38,19 +37,18 @@ module Redmine::Installer::Step
 
       # Locate redmine_root in tmpdir
       get_tmp_redmine_root
-      base.tmp_redmine_root = @tmp_redmine_root
       base.settings[:tmpdir] = @tmpdir
 
       # Change dir to redmine located in tmpdir
-      Dir.chdir(@tmp_redmine_root)
+      Dir.chdir(base.tmp_redmine_root)
     end
 
     def save(configuration)
-      configuration['redmine_root'] = @redmine_root
+      configuration['redmine_root'] = base.redmine_root
     end
 
     def load(configuration)
-      @redmine_root = configuration['redmine_root']
+      base.redmine_root = configuration['redmine_root']
     end
 
     private
@@ -92,13 +90,13 @@ module Redmine::Installer::Step
       # ...
       #
       def get_tmp_redmine_root
-        @tmp_redmine_root = @tmpdir
+        base.tmp_redmine_root = @tmpdir
 
         loop {
-          ls = Dir.glob(File.join(@tmp_redmine_root, '*'))
+          ls = Dir.glob(File.join(base.tmp_redmine_root, '*'))
 
           if ls.size == 1
-            @tmp_redmine_root = ls.first
+            base.tmp_redmine_root = ls.first
           else
             break
           end

@@ -40,6 +40,7 @@ module Redmine::Installer
       end
 
       desc I18n.translate(:cli_backup_desc)
+      arg :redmine_root
       command [:b, :backup] do |c|
         c.flag [:p, :profile]
         c.action do |global_options, options, args|

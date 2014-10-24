@@ -10,7 +10,6 @@ module Redmine::Installer
     ]
 
     attr_accessor :package
-    attr_accessor :backup_dir
 
     def initialize(package, options={})
       self.package = package

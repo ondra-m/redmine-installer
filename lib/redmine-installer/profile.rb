@@ -61,11 +61,13 @@ module Redmine::Installer
 
       configuration = @data[@id]
 
-      return if configuration.nil?
+      return {} if configuration.nil?
 
       task.steps.each do |_, step|
         step.load(configuration)
       end
+
+      return configuration
     end
 
   end

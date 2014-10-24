@@ -33,29 +33,29 @@ module Redmine::Installer::Step
 
     def save(configuration)
       configuration['backup_type'] = @backup_type
-      configuration['backup_dir'] = base.backup_dir
+      configuration['backup_dir'] = @backup_dir
     end
 
     def load(configuration)
       @backup_type = configuration['backup_type']
-      base.backup_dir = configuration['backup_dir']
+      @backup_dir = configuration['backup_dir']
     end
 
     private
 
       def check_backup_dir
-        if base.backup_dir.nil?
+        if @backup_dir.nil?
           dir = ask(:what_dir_for_backups, default: DEFAULT_BACKUP_DIR)
           dir = File.expand_path(dir)
 
           try_create_dir(dir) unless Dir.exist?(dir)
 
-          base.backup_dir = dir
+          @backup_dir = dir
         end
       end
 
       def create_current_backup_dir
-        @current_backup_dir = File.join(base.backup_dir, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
+        @current_backup_dir = File.join(@backup_dir, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
         try_create_dir(@current_backup_dir)
       end
 
