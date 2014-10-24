@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Redmine-installer can fully install/upgrade redmine and will
                        generate template for different server. All actions can be saved
                        for further use.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/ondra-m/redmine-installer"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
