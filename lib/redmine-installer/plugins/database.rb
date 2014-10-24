@@ -105,6 +105,11 @@ module Redmine::Installer::Plugin
       Kernel.system(command_for_restore(file))
     end
 
+    # Get valu from param
+    def get(name)
+      params[name].value
+    end
+
 
     class MySQL < Database
       def self.adapter_name
@@ -117,7 +122,7 @@ module Redmine::Installer::Plugin
       end
 
       def command_args
-        "-h #{params['host'].value} -P #{params['port'].value} -u #{params['username'].value} -p#{params['password'].value} #{params['database'].value}"
+        "-h #{params['host'].value} -P #{get('port')} -u #{get('username')} -p#{get('password')} #{get('database')}"
       end
 
       def command_for_backup(file)
@@ -140,7 +145,7 @@ module Redmine::Installer::Plugin
       end
 
       def command(comm, file)
-        %{PGPASSWORD="#{params['password'].value}" #{comm} -i -h #{params['host'].value} -p #{params['port'].value} -U #{params['username'].value} -Fc -f #{file}}
+        %{PGPASSWORD="#{get('password')}" #{comm} -i -h #{get('host')} -p #{get('port')} -U #{get('username')} -Fc -f #{file}}
       end
 
       def command_for_backup(file)
