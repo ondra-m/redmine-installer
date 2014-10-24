@@ -3,17 +3,17 @@ require 'spec_helper'
 RSpec.describe Redmine::Installer::Upgrade do
 
   before(:example) do
-    @dir2 = Dir.mktmpdir
+    @dir1 = Dir.mktmpdir
     @dir2 = Dir.mktmpdir
   end
 
   after(:example) do
-    FileUtils.remove_entry_secure(@dir2)
+    FileUtils.remove_entry_secure(@dir1)
     FileUtils.remove_entry_secure(@dir2)
   end
 
   let(:package1) { LoadRedmine.get('2.4.7') }
-  let(:package1) { LoadRedmine.get('2.5.0') }
+  let(:package2) { LoadRedmine.get('2.5.0') }
 
   context 'mysql' do
     let(:host)     { RSpec.configuration.mysql[:host] }
@@ -35,9 +35,10 @@ RSpec.describe Redmine::Installer::Upgrade do
       # encoding -> utf8
       # port -> configuration
       # email configuration -> skip
+      # webserver -> skip
 
       allow($stdin).to receive(:gets).and_return(
-        @dir1, '1', 'test1', host, username, password, 'utf8', port, '999'
+        @dir1, '1', 'test1', host, username, password, 'utf8', port, '999', '999'
       )
 
       r_installer = Redmine::Installer::Install.new(package1, {})
@@ -53,7 +54,7 @@ RSpec.describe Redmine::Installer::Upgrade do
         @dir1, '2', @dir2, 'y'
       )
 
-      r_upgrader = Redmine::Installer::Backup.new(package2, {})
+      r_upgrader = Redmine::Installer::Upgrade.new(package2, {})
       expect { r_upgrader.run }.to_not raise_error
     end
   end

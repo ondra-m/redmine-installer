@@ -32,9 +32,10 @@ RSpec.describe Redmine::Installer::Install do
       # encoding -> utf8
       # port -> configuration
       # email configuration -> skip
+      # webserver -> skip
 
       allow($stdin).to receive(:gets).and_return(
-        @dir, '1', 'test1', host, username, password, 'utf8', port, '999'
+        @dir, '1', 'test1', host, username, password, 'utf8', port, '999', '999'
       )
 
       r_installer = Redmine::Installer::Install.new(package1, {})
