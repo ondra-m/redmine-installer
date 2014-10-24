@@ -8,10 +8,11 @@ module Redmine::Installer::Plugin
 
     attr_reader :params
 
-    def self.backup_all(redmine_root, backup_dir)
+    def self.load_all(redmine_root)
       database_file = File.join(redmine_root, DATABASE_YML_PATH)
-      return unless File.exist?(database_file)
+      return [] unless File.exist?(database_file)
 
+      to_return = []
       definitions = YAML.load_file(database_file)
       definitions.each do |name, data|
 
@@ -21,7 +22,21 @@ module Redmine::Installer::Plugin
 
         klass = klass.new
         klass.load(data)
+
+        to_return << klass
+      end
+      to_return
+    end
+
+    def self.backup_all(redmine_root, backup_dir)
+      load_all(redmine_root).each do |klass|
         klass.backup(backup_dir)
+      end
+    end
+
+    def self.restore_all(redmine_root, backup_dir)
+      load_all(redmine_root).each do |klass|
+        klass.restore(backup_dir)
       end
     end
 
@@ -69,7 +84,7 @@ module Redmine::Installer::Plugin
 
     def file_for_backup(dir)
       FileUtils.mkdir_p(File.join(dir, DATABASE_BACKUP_DIR))
-      File.join(dir, DATABASE_BACKUP_DIR, "#{self.class.adapter_name}_#{params['database'].value}.dump")
+      File.join(dir, DATABASE_BACKUP_DIR, "#{self.class.adapter_name}.#{params['database'].value}.dump")
     end
 
     def backup(dir)
@@ -79,6 +94,15 @@ module Redmine::Installer::Plugin
       return if File.exist?(file)
 
       Kernel.system(command_for_backup(file))
+    end
+
+    def restore(dir)
+      file = file_for_backup(dir)
+
+      # More enviroments can use the same database
+      return unless File.exist?(file)
+
+      Kernel.system(command_for_restore(file))
     end
 
 
@@ -92,8 +116,16 @@ module Redmine::Installer::Plugin
         @params.add('port').default(3306)
       end
 
+      def command_args
+        "-h #{params['host'].value} -P #{params['port'].value} -u #{params['username'].value} -p#{params['password'].value} #{params['database'].value}"
+      end
+
       def command_for_backup(file)
-        "mysqldump -h #{params['host'].value} -P #{params['port'].value} -u #{params['username'].value} -p#{params['password'].value} #{params['database'].value} > #{file}"
+        "mysqldump #{command_args} > #{file}"
+      end
+
+      def command_for_restore(file)
+        "mysql #{command_args} < #{file}"
       end
     end
 
@@ -107,8 +139,16 @@ module Redmine::Installer::Plugin
         @params.add('port').default(5432)
       end
 
+      def command(comm, file)
+        %{PGPASSWORD="#{params['password'].value}" #{comm} -i -h #{params['host'].value} -p #{params['port'].value} -U #{params['username'].value} -Fc -f #{file}}
+      end
+
       def command_for_backup(file)
-        %{PGPASSWORD="#{params['password'].value}" pg_dump -i -h #{params['host'].value} -p #{params['port'].value} -U #{params['username'].value} -Fc -f #{file}}
+        command('pg_dump', file)
+      end
+
+      def command_for_restore(file)
+        command('psql', file)
       end
     end
 

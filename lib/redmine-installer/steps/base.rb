@@ -5,10 +5,12 @@ module Redmine::Installer::Step
 
     attr_accessor :index
     attr_accessor :base
+    attr_accessor :ran
 
     def initialize(index, base)
       self.index = index
       self.base = base
+      self.ran = false
     end
 
     def print_title

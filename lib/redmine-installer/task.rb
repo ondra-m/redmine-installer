@@ -27,11 +27,17 @@ module Redmine::Installer
         step.print_header
         step.up
         step.print_footer
+        step.ran = true
         puts
       end
 
       @steps.each do |id, step|
         step.final_step
+      end
+    rescue
+      @steps.reverse.each do |id, step|
+        next unless step.ran
+        step.down
       end
     end
 

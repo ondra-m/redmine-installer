@@ -25,6 +25,10 @@ module Redmine::Installer::Step
       end
     end
 
+    def down
+      database_restore if @database_backed_up
+    end
+
     def final_step
       if @current_backup_dir
         say t(:backup_is_stored_at, dir: @current_backup_dir), 2
@@ -61,6 +65,11 @@ module Redmine::Installer::Step
 
       def database_backup
         plugin::Database.backup_all(base.redmine_root, @current_backup_dir)
+        @database_backed_up = true
+      end
+
+      def database_restore
+        plugin::Database.restore_all(base.redmine_root, @current_backup_dir)
       end
 
       def do_full_backup
