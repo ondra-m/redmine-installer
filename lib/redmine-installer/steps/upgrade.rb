@@ -23,13 +23,15 @@ module Redmine::Installer::Step
         end
       end
 
-      run_command(command::BUNDLE_INSTALL, :'command.bundle_install')
-      run_command(command::RAKE_DB_MIGRATE, :'command.rake_db_migrate')
-      run_command(command::RAKE_REDMINE_PLUGIN_MIGRATE, :'command.rake_redmine_plugin_migrate') if redmine_plugins.any?
-      run_command(command::RAKE_GENERATE_SECRET_TOKEN, :'command.rake_generate_secret_token')
+      Dir.chdir(base.tmp_redmine_root) do
+        run_command(command::BUNDLE_INSTALL, :'command.bundle_install')
+        run_command(command::RAKE_DB_MIGRATE, :'command.rake_db_migrate')
+        run_command(command::RAKE_REDMINE_PLUGIN_MIGRATE, :'command.rake_redmine_plugin_migrate') if redmine_plugins.any?
+        run_command(command::RAKE_GENERATE_SECRET_TOKEN, :'command.rake_generate_secret_token')
 
-      # Other plugins can have post-install procedure
-      plugin::RedminePlugin.all.each(&:upgrade)
+        # Other plugins can have post-install procedure
+        plugin::RedminePlugin.all.each(&:upgrade)
+      end
 
       # Delete content of redmine_root
       Dir.glob(File.join(base.redmine_root, '{*,.*}')) do |entry|
