@@ -9,6 +9,8 @@ $LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'redmine-installer'
 require 'load_redmine'
 
+I18n.locale = :en
+
 RSpec.configure do |config|
   config.default_formatter = 'doc'
   config.color = true
