@@ -38,6 +38,15 @@ You can instal redmine package. Currently is supported only zip format.
 redmine install Downloads/redmine-2.3.0.zip
 ```
 
+Steps:
+- *1. Redmine root* - where should be new redmine located
+- *2. Load package* - extract package
+- *3. Database configuration* - you can choose type of DB which you want to use
+- *4. Email sending configuration* - email sending configuration
+- *5. Install* - install commands are executed
+- *6. Moving redmine* - redmine is moved from temporarily folder to given redmine_root
+- *7. Webserve configuration* - generating webserver configuration
+
 ### Upgrade
 
 ```
