@@ -1,29 +1,89 @@
 # Redmine::Installer
 
-TODO: Write a gem description
-
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'redmine-installer'
+```
+gem 'redmine-installer'
+```
 
 And then execute:
 
-    $ bundle
+```
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install redmine-installer
+```
+$ gem install redmine-installer
+```
 
 ## Usage
 
-TODO: Write usage instructions here
+#### Shortcut
 
-## Contributing
+```
+i -> install
+u -> upgrade
+b -> backup
+```
 
-1. Fork it ( https://github.com/[my-github-username]/redmine-installer/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+### Instalation
+
+You can instal redmine package. Currently is supported only zip format.
+
+```
+redmine install Downloads/redmine-2.3.0.zip
+```
+
+### Upgrade
+
+```
+redmine upgrade Downloads/redmine-2.5.2.zip
+```
+
+Final step will ask you if you want save step configuration. If you say YES, configuration will be stored as profile so next time you can upgrade redmine faster.
+
+```
+redmine upgrade Downloads/redmine-2.5.2.zip --profile 1
+```
+
+### Backup
+
+```
+redmine backup
+```
+
+You can choose one of 3 types.
+
+<table>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Full backup</b></td>
+      <td>archive full redmine_root folder with all you databases defined at config/database.yml</td>
+    </tr>
+    <tr>
+      <td><b>Backup</b></td>
+      <td>
+        archive
+        <ul>
+          <li>files folder</li>
+          <li>config/database.yml, config/configuration.yml</li>
+          <li>databases</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Only database</b></td>
+      <td>archive only databases</td>
+    </tr>
+  </tbody>
+</table>
