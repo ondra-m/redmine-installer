@@ -9,7 +9,7 @@ module Redmine::Installer
     end
 
     def self.start(argv)
-      program_desc spec.summary
+      program_desc I18n.translate(:redmine_installer_summary)
       version Redmine::Installer::VERSION
 
       desc I18n.translate(:cli_show_verbose_output)

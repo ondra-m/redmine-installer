@@ -1,4 +1,6 @@
+
 en:
+  redmine_installer_summary: 'Easy way how install/upgrade redmine or plugin.'
   backup: 'Backup'
   backup_is_stored_at: 'Backup is stored at <bright>%{dir}</bright>'
   cli_install_desc: 'Install redmine from package'
@@ -24,6 +26,7 @@ en:
   try_again: 'try again'
   what_dir_for_backups: 'What dir for backups?'
   what_database_do_you_want: 'What database do you want?'
+  what_web_server_do_you_want: 'What web-server do you want?'
   welcome_to: 'Welcome to'
   yes_t: 'yes'
   your_profile_can_be_used_as: 'Your profile is saved as #%{id} and can be use with <bright>--profile %{id}</bright>'
