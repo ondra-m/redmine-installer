@@ -59,11 +59,16 @@ module Redmine::Installer::Step
       end
 
       def create_current_backup_dir
+        return if @current_backup_dir
+
+        check_backup_dir
         @current_backup_dir = File.join(@backup_dir, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
         try_create_dir(@current_backup_dir)
       end
 
       def database_backup
+        create_current_backup_dir
+
         plugin::Database.backup_all(base.redmine_root, @current_backup_dir)
         @database_backed_up = true
       end
@@ -73,7 +78,6 @@ module Redmine::Installer::Step
       end
 
       def do_full_backup
-        check_backup_dir
         create_current_backup_dir
 
         zipfile_name = File.join(@current_backup_dir, 'redmine.zip')
@@ -92,7 +96,6 @@ module Redmine::Installer::Step
       end
 
       def do_backup
-        check_backup_dir
         create_current_backup_dir
 
         # create config dir
