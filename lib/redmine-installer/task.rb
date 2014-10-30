@@ -34,11 +34,15 @@ module Redmine::Installer
       @steps.each do |id, step|
         step.final_step
       end
-    rescue
-      @steps.reverse.each do |id, step|
+    rescue Redmine::Installer::Error => e
+      @steps.values.reverse.each do |step|
         next unless step.ran
         step.down
       end
+
+      $stderr.puts(ANSI.red, e.message, ANSI.clear)
+      $stderr.flush
+      exit(1)
     end
 
     def self.step
