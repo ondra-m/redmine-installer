@@ -4,7 +4,11 @@ module Redmine::Installer::Step
     include Redmine::Installer::Helper::GenerateConfig
 
     def up
-      create_for(plugin::Database)
+      if create_for(plugin::Database)
+        # continue
+      else
+        base.settings[:skip_migration] = true
+      end
     end
 
   end

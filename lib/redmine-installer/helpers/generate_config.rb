@@ -12,7 +12,7 @@ module Redmine::Installer::Helper
       answer = choose(nil, choices, default: nil)
 
       # Skip
-      return if answer.nil?
+      return false if answer.nil?
 
       instance = answer.new
 
@@ -22,6 +22,7 @@ module Redmine::Installer::Helper
       end
 
       instance.make_config(base.tmp_redmine_root)
+      return true
     end
 
   end

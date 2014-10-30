@@ -4,6 +4,9 @@ module Redmine::Installer::Step
     def up
       Dir.chdir(base.tmp_redmine_root) do
         run_command(command::BUNDLE_INSTALL, :'command.bundle_install')
+
+        return if base.settings[:skip_migration]
+
         run_command(command::RAKE_DB_CREATE, :'command.rake_db_create')
         run_command(command::RAKE_DB_MIGRATE, :'command.rake_db_migrate')
         run_command(command::RAKE_REDMINE_PLUGIN_MIGRATE, :'command.rake_redmine_plugin_migrate') if some_plugins?
