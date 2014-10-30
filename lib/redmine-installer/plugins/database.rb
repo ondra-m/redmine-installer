@@ -111,6 +111,9 @@ module Redmine::Installer::Plugin
     end
 
 
+    # =========================================================================
+    # MySQL
+
     class MySQL < Database
       def self.adapter_name
         'mysql2'
@@ -126,13 +129,17 @@ module Redmine::Installer::Plugin
       end
 
       def command_for_backup(file)
-        "mysqldump #{command_args} > #{file}"
+        "mysqldump --add-drop-database #{command_args} > #{file}"
       end
 
       def command_for_restore(file)
         "mysql #{command_args} < #{file}"
       end
     end
+
+
+    # =========================================================================
+    # PostgreSQL
 
     class PostgreSQL < Database
       def self.adapter_name
