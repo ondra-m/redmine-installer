@@ -37,16 +37,27 @@ module Redmine::Installer
         raise Redmine::Installer::Error, message
       end
 
-      def exec(*args)
-        Redmine::Installer::Exec.new(*args)
-      end
+      # def exec(*args)
+      #   Redmine::Installer::Exec.new(*args)
+      # end
 
-      def run_command(command, title)
-        executing = exec(command).with_title(title)
+      def run_command(command, title, repeatable=true)
+        title = translate(title) if title.is_a?(Symbol)
+        message = "--> <yellow>#{title}</yellow>"
+        colorize(message)
 
-        unless executing.run(true)
-          error(executing.stderr)
+        puts '-->'
+        puts message
+        puts '-->'
+        success = Kernel.system(command)
+
+        unless success
+          if repeatable && confirm(:do_you_want_repeat_command, false)
+            return run_command(command, title, repeatable)
+          end
         end
+
+        return success
       end
 
       # Try create a dir

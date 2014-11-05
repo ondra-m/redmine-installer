@@ -29,66 +29,40 @@ module Redmine::Installer
     end
 
     def with_timer(yes_no)
-      # if $stdout.tty?
-      #   @with_timer = yes_no
-      # else
-      #   @with_timer = false
-      # end
-      # self
-
-      @with_timer = false
+      if $stdout.tty?
+        @with_timer = yes_no
+      else
+        @with_timer = false
+      end
+      self
     end
 
     def run(repeatable=false)
-      # show_title
+      show_title
 
-      # Open3.popen3(@command) do |stdin, stdout, stderr, wait_thr|
-      #   # log = StringIO.new
-      #   # redirect_stream(stdout, log)
-      #   # redirect_stream(stderr, log)
+      Open3.popen3(@command) do |stdin, stdout, stderr, wait_thr|
+        # log = StringIO.new
+        # redirect_stream(stdout, log)
+        # redirect_stream(stderr, log)
 
-      #   # For example: rake db:create can ask for root login
-      #   # if current setting does not work
-      #   # stdin.closes
+        # For example: rake db:create can ask for root login
+        # if current setting does not work
+        # stdin.closes
 
-      #   exit_status = wait_thr.value
-      #   @stdout = stdout.read
-      #   @stderr = stderr.read
+        exit_status = wait_thr.value
+        @stdout = stdout.read
+        @stderr = stderr.read
 
-      #   stop_timer
-      #   if exit_status.success?
-      #     print_result(true)
-      #     @return_value = true
-      #   else
-      #     print_result(false)
-      #     @return_value = false
-      #     # raise Redmine::Installer::Error, stderr.read
-      #   end
-      # end
-
-      # $stderr.puts(ANSI.red)
-      # @stdout = `#{@command}`
-      # $stderr.puts(ANSI.clear)
-
-      # @return_value = $?.
-      # stop_timer
-
-      # stdin, stdout, stderr, wait_thr = Open3.popen3(@command)
-      # pid = wait_thr[:pid]  # pid of the started process.
-      # stdin.close  # stdin, stdout and stderr should be closed explicitly in this form.
-      # # stdout.close
-      # # stderr.close
-      # exit_status = wait_thr.value  # Process::Status object returned.
-
-      # @return_value = exit_status.success? ? true : false
-
-      message = "--> <yellow>#{@title}</yellow>"
-      colorize(message)
-
-      puts '-->'
-      puts message
-      puts '-->'
-      success = Kernel.system(@command)
+        stop_timer
+        if exit_status.success?
+          print_result(true)
+          @return_value = true
+        else
+          print_result(false)
+          @return_value = false
+          # raise Redmine::Installer::Error, stderr.read
+        end
+      end
 
       unless success
         # print_error
