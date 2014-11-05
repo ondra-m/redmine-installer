@@ -5,6 +5,10 @@ module Redmine::Installer
     RAKE_GENERATE_SECRET_TOKEN = 'bundle exec rake generate_secret_token RAILS_ENV=production'
     RAKE_REDMINE_PLUGIN_MIGRATE = 'bundle exec rake redmine:plugins:migrate RAILS_ENV=production'
     BUNDLE_INSTALL = 'bundle install --without development test'
+
+    def self.git_clone(repository, target=nil)
+      "git clone #{repository} #{target}"
+    end
   end
 end
 
