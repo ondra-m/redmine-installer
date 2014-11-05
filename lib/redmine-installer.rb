@@ -2,7 +2,6 @@ module Redmine
   module Installer
     autoload :CLI,          'redmine-installer/cli'
     autoload :Task,         'redmine-installer/task'
-    autoload :Install,      'redmine-installer/install'
     autoload :Utils,        'redmine-installer/utils'
     autoload :Step,         'redmine-installer/step'
     autoload :ConfigParams, 'redmine-installer/config_param'
@@ -10,9 +9,7 @@ module Redmine
     autoload :Helper,       'redmine-installer/helper'
     autoload :Command,      'redmine-installer/command'
     autoload :Exec,         'redmine-installer/exec'
-    autoload :Upgrade,      'redmine-installer/upgrade'
     autoload :Profile,      'redmine-installer/profile'
-    autoload :Backup,       'redmine-installer/backup'
 
     # Root of the gem
     def self.root_path
@@ -65,6 +62,9 @@ require 'redmine-installer/version'
 require 'redmine-installer/error'
 require 'redmine-installer/ext/string'
 require 'redmine-installer/ext/module'
+require 'redmine-installer/install'
+require 'redmine-installer/upgrade'
+require 'redmine-installer/backup'
 
 # Default configurations
 Redmine::Installer.set_i18n

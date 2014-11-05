@@ -49,5 +49,22 @@ module Redmine::Installer
       Redmine::Installer::Step
     end
 
+    # Creating methods for recognition type of task
+    #
+    # == Examples:
+    #   class Install < Task
+    #   end
+    #
+    #   Install.new.install? #=> true
+    #
+    def self.inherited(child)
+      method_name = "#{child.class_name.downcase}?".to_sym
+
+      define_method(method_name) { false }
+      child.send(:define_method, method_name) { true }
+
+      super
+    end
+
   end
 end

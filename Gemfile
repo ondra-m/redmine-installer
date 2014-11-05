@@ -8,6 +8,7 @@ gem 'i18n'
 gem 'ansi'
 gem 'notifier'
 gem 'ruby-progressbar'
+gem 'git', require: false
 
 group :development do
   gem 'pry'
