@@ -4,7 +4,7 @@
 module Redmine::Installer::Step
   class Validation < Base
 
-    REDMINE_SHOULD_CONTAINT = [
+    REDMINE_SHOULD_CONTAINS = [
       'app', 'lib', 'config', 'public', 'db',
       'Gemfile', 'Rakefile', 'config.ru',
       File.join('lib', 'redmine'),
@@ -20,8 +20,8 @@ module Redmine::Installer::Step
       end
 
       # Is this redmine
-      unless (@records & REDMINE_SHOULD_CONTAINT) == REDMINE_SHOULD_CONTAINT
-        error :error_redmine_not_contains_all, records: REDMINE_SHOULD_CONTAINT.join(', ')
+      unless (@records & REDMINE_SHOULD_CONTAINS) == REDMINE_SHOULD_CONTAINS
+        error :error_redmine_not_contains_all, records: REDMINE_SHOULD_CONTAINS.join(', ')
       end
 
       # Plugins are in righ dir

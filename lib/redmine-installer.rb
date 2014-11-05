@@ -38,7 +38,7 @@ module Redmine
     end
 
     def self.print_logo
-      $stdout.puts %{#{I18n.t(:welcome_to)}
+      $stdout.puts <<-PRINT
                     _             _                     
      _ __  ___   __| | _ __ ___  (_) _ __    ___        
     | '__|/ _ \\ / _` || '_ ` _ \\ | || '_ \\  / _ \\ _____ 
@@ -50,7 +50,9 @@ module Redmine
     | || | | |\\__ \\| |_| (_| || || ||  __/| |   
     |_||_| |_||___/ \\__|\\__,_||_||_| \\___||_|  
 
-      }
+    #{I18n.translate(:powered_by)}
+
+      PRINT
     end
 
   end
