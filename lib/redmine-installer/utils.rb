@@ -8,8 +8,12 @@ module Redmine::Installer
     def self.included(base)
       base.send :extend,  Methods
       base.send :include, Methods
+
+      base.class_eval do
+        self.send(:const_set, 'Git', Redmine::Installer::Git)
+      end
     end
-   
+
     module Methods
 
       # =======================================================================
@@ -81,6 +85,7 @@ module Redmine::Installer
           end
         end
       end
+
 
       # =======================================================================
       # Input, output
