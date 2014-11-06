@@ -16,6 +16,8 @@ module Redmine::Installer
     def initialize(package, options={})
       self.package = package
       super(options)
+
+      check_package
     end
 
   end

@@ -11,7 +11,6 @@ module Redmine::Installer::Step
     def up
       case base.options[:source]
       when 'file'
-        check_package
         load_file
       when 'git'
         load_git
@@ -29,14 +28,6 @@ module Redmine::Installer::Step
 
       # =======================================================================
       # General
-
-      # Package is required for install task and
-      # upgrade with source file
-      def check_package
-        if base.package.nil?
-          error :error_argument_package_is_missing
-        end
-      end
 
       def create_tmp_dir
         @tmpdir = Dir.mktmpdir
@@ -118,26 +109,18 @@ module Redmine::Installer::Step
       # Git
 
       def load_git
-        require 'git'
-
         create_tmp_dir
 
-        # Install need package from user
-        if base.install?
-          check_package
-        end
-        
         # Package is remote url to git repository
         remote = base.package
 
-        # If user will not enter remote url
-        # -> remote url is taken from redmine_root
-        if remote.nil?
-          remote = Git.open(base.redmine_root).remote.url
+        if remote
+          # Clone repository
+          Git.clone(remote, @tmpdir, base.options['branch'])
+        else
+          # Copy current repository to tmp and run pull
+          Git.copy_and_fetch(base.redmine_root, @tmpdir)
         end
-
-        # Clone repository
-        Git.clone(remote, @tmpdir, depth: 1)
 
         # Locate redmine_root in tmpdir
         get_tmp_redmine_root

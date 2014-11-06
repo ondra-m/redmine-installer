@@ -23,7 +23,11 @@ module Redmine::Installer
       desc I18n.translate(:cli_install_desc)
       command [:i, :install] do |c|
         c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git']
+                              must_match: ['file', 'git'],
+                              desc: I18n.translate(:cli_flag_source)
+
+        c.flag [:b, :branch], default_value: 'master',
+                              desc: I18n.translate(:cli_flag_branch)
 
         c.action do |global_options, options, args|
           r_installer = Redmine::Installer::Install.new(args.first, global_options.merge(options))
@@ -36,7 +40,8 @@ module Redmine::Installer
       command [:u, :upgrade] do |c|
         c.flag [:p, :profile]
         c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git']
+                              must_match: ['file', 'git'],
+                              desc: I18n.translate(:cli_flag_source)
 
         c.action do |global_options, options, args|
           r_upgrader = Redmine::Installer::Upgrade.new(args.first, global_options.merge(options))

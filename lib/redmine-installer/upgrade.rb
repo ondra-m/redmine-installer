@@ -15,6 +15,8 @@ module Redmine::Installer
     def initialize(package, options={})
       self.package = package
       super(options)
+
+      check_package if options[:source] == 'file'
     end
 
     def run

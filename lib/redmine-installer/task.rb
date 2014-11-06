@@ -45,6 +45,14 @@ module Redmine::Installer
       exit(1)
     end
 
+    # Package is required for install task and
+    # upgrade with source file
+    def check_package
+      if package.nil?
+        raise Redmine::Installer::Error, I18n.translate(:error_argument_package_is_missing)
+      end
+    end
+
     def self.step
       Redmine::Installer::Step
     end
