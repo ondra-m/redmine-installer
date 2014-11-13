@@ -1,12 +1,16 @@
+require 'rubygems/package'
 require 'ruby-progressbar'
 require 'fileutils'
 require 'zip'
 require 'tmpdir'
+require 'zlib'
 
 module Redmine::Installer::Step
   class LoadPackage < Base
 
-    SUPPORTED_ARCHIVE_FORMATS = ['.zip']
+    SUPPORTED_ARCHIVE_FORMATS = ['.zip', '.gz', '.tgz']
+    TAR_LONGLINK = '././@LongLink'
+    PROGRESSBAR_FORMAT = '%a |%b>%i| %p%% %t'
 
     def up
       case base.options[:source]
@@ -86,19 +90,65 @@ module Redmine::Installer::Step
         case @type
         when '.zip'
           extract_zip
+        when '.gz', '.tgz'
+          extract_tar_gz
         end
       end
 
       def extract_zip
         Zip::File.open(base.package) do |zip_file|
           # Progressbar
-          progressbar = ProgressBar.create(format: '%a |%b>%i| %p%% %t', total: zip_file.size)
+          progressbar = ProgressBar.create(format: PROGRESSBAR_FORMAT, total: zip_file.size)
 
           zip_file.each do |entry|
             dest_file = File.join(@tmpdir, entry.name)
             FileUtils.mkdir_p(File.dirname(dest_file))
 
             entry.extract(dest_file)
+            progressbar.increment
+          end
+        end
+      end
+
+      # Extract .tar.gz archive
+      # based on http://dracoater.blogspot.cz/2013/10/extracting-files-from-targz-with-ruby.html
+      # 
+      # Originally tar did not support paths longer than 100 chars. GNU tar is better and they 
+      # implemented support for longer paths, but it was made through a hack called ././@LongLink. 
+      # Shortly speaking, if you stumble upon an entry in tar archive which path equals to above 
+      # mentioned ././@LongLink, that means that the following entry path is longer than 100 chars and
+      # is truncated. The full path of the following entry is actually the value of the current entry.
+      #
+      def extract_tar_gz
+        Gem::Package::TarReader.new(Zlib::GzipReader.open(base.package)) do |tar|
+
+          # Progressbar
+          progressbar = ProgressBar.create(format: PROGRESSBAR_FORMAT, total: tar.count)
+
+          # tar.count move position pointer to end
+          tar.rewind
+
+          dest_file = nil
+          tar.each do |entry|
+            if entry.full_name == TAR_LONGLINK
+              dest_file = File.join(@tmpdir, entry.read.strip)
+              next
+            end
+            dest_file ||= File.join(@tmpdir, entry.full_name)
+            if entry.directory?
+              FileUtils.rm_rf(dest_file) unless File.directory?(dest_file)
+              FileUtils.mkdir_p(dest_file, mode: entry.header.mode, verbose: false)
+            elsif entry.file?
+              FileUtils.rm_rf(dest_file) unless File.file?(dest_file)
+              File.open(dest_file, 'wb') do |f|
+                f.write(entry.read)
+              end
+              FileUtils.chmod(entry.header.mode, dest_file, verbose: false)
+            elsif entry.header.typeflag == '2' # symlink
+              File.symlink(entry.header.linkname, dest_file)
+            end
+
+            dest_file = nil
             progressbar.increment
           end
         end
