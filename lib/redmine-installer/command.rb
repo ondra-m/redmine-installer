@@ -8,13 +8,7 @@ module Redmine::Installer
     RAKE = 'bundle exec rake'
 
     def bundle_install(env)
-      if env.include?('production')
-        add = '--without development test'
-      else
-        add = ''
-      end
-
-      run('bundle install', add, :'command.bundle_install')
+      run('bundle install', get_bundle_env(env), :'command.bundle_install')
     end
 
     def rake_db_create(env)
@@ -32,7 +26,6 @@ module Redmine::Installer
     def rake_generate_secret_token(env)
       run(RAKE, 'generate_secret_token', get_rails_env(env), :'command.rake_generate_secret_token')
     end
-
 
     private
 
@@ -65,6 +58,14 @@ module Redmine::Installer
         if    env.include?('production');  'RAILS_ENV=production'
         elsif env.include?('development'); 'RAILS_ENV=development'
         elsif env.include?('test');        'RAILS_ENV=test'
+        else
+          ''
+        end
+      end
+
+      def get_bundle_env(env)
+        if env.include?('production')
+          '--without development test'
         else
           ''
         end

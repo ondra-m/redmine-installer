@@ -9,17 +9,21 @@ module Redmine::Installer
     end
 
     def self.start(argv)
+      # Program settings
       program_desc I18n.translate(:redmine_installer_summary)
       version Redmine::Installer::VERSION
 
+      # Global options
       desc I18n.translate(:cli_show_verbose_output)
       default_value false
-      switch [:d, :debug], negatable: false
+      switch [:d, :v, :debug, :verbose], negatable: false
 
+      # Before all action
       # pre do |global_options, command, options, args|
       #   $verbose = global_options[:debug]
       # end
 
+      # Install command
       desc I18n.translate(:cli_install_desc)
       command [:i, :install] do |c|
         c.flag [:s, :source], default_value: 'file',
@@ -29,12 +33,16 @@ module Redmine::Installer
         c.flag [:b, :branch], default_value: 'master',
                               desc: I18n.translate(:cli_flag_branch)
 
+        c.flag [:e, :env, :environment], default_value: ['production'],
+                                         desc: I18n.translate(:cli_flag_environment),
+                                         type: Array
+
         c.action do |global_options, options, args|
-          r_installer = Redmine::Installer::Install.new(args.first, global_options.merge(options))
-          r_installer.run
+          run_action('install', args.first, options)
         end
       end
 
+      # Upgrade command
       desc I18n.translate(:cli_upgrade_desc)
       arg :package
       command [:u, :upgrade] do |c|
@@ -43,23 +51,30 @@ module Redmine::Installer
                               must_match: ['file', 'git'],
                               desc: I18n.translate(:cli_flag_source)
 
+        c.flag [:e, :env, :environment], default_value: ['production'],
+                                         desc: I18n.translate(:cli_flag_environment),
+                                         type: Array
+
         c.action do |global_options, options, args|
-          r_upgrader = Redmine::Installer::Upgrade.new(args.first, global_options.merge(options))
-          r_upgrader.run
+          run_action('upgrade', args.first, options)
         end
       end
 
+      # Backup command
       desc I18n.translate(:cli_backup_desc)
       arg :redmine_root
       command [:b, :backup] do |c|
         c.flag [:p, :profile]
         c.action do |global_options, options, args|
-          r_upgrader = Redmine::Installer::Backup.new(args.first, global_options.merge(options))
-          r_upgrader.run
+          run_action('backup', args.first, options)
         end
       end
 
       run(argv)
+    end
+
+    def self.run_action(action, *args)
+      Redmine::Installer.const_get(action.capitalize).new(*args).run
     end
 
   end
