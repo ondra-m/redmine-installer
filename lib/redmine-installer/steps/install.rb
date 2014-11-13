@@ -17,11 +17,5 @@ module Redmine::Installer::Step
       end
     end
 
-    private
-
-      def some_plugins?
-        Dir.glob(File.join('plugins', '*')).any?
-      end
-
   end
 end

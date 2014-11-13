@@ -86,6 +86,11 @@ module Redmine::Installer
         end
       end
 
+      # Check if there are plugins in plugin dir
+      def some_plugins?
+        Dir.glob(File.join('plugins', '*')).select{|record| File.directory?(record)}.any?
+      end
+
 
       # =======================================================================
       # Input, output
