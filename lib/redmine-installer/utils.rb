@@ -24,7 +24,7 @@ module Redmine::Installer
       end
 
       def command
-        Redmine::Installer::Command
+        Redmine::Installer::Command.instance
       end
 
       def error(*args)
@@ -45,24 +45,24 @@ module Redmine::Installer
       #   Redmine::Installer::Exec.new(*args)
       # end
 
-      def run_command(command, title, repeatable=true)
-        title = translate(title) if title.is_a?(Symbol)
-        message = "--> <yellow>#{title}</yellow>"
-        colorize(message)
+      # def run_command(command, title, repeatable=true)
+      #   title = translate(title) if title.is_a?(Symbol)
+      #   message = "--> <yellow>#{title}</yellow>"
+      #   colorize(message)
 
-        puts '-->'
-        puts message
-        puts '-->'
-        success = Kernel.system(command)
+      #   puts '-->'
+      #   puts message
+      #   puts '-->'
+      #   success = Kernel.system(command)
 
-        unless success
-          if repeatable && confirm(:do_you_want_repeat_command, false)
-            return run_command(command, title, repeatable)
-          end
-        end
+      #   unless success
+      #     if repeatable && confirm(:do_you_want_repeat_command, false)
+      #       return run_command(command, title, repeatable)
+      #     end
+      #   end
 
-        return success
-      end
+      #   return success
+      # end
 
       # Try create a dir
       # When mkdir raise an error (permission problem) method

@@ -5,13 +5,15 @@ module Redmine::Installer
     attr_accessor :tmp_redmine_root
     attr_accessor :options
     attr_accessor :settings
+    attr_accessor :env
 
     attr_reader :steps
 
     def initialize(options={})
       self.options = options
       self.settings = {}
-      
+      self.env = options[:env]
+
       # Initialize steps for task
       @steps = {}
       index = 1
