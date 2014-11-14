@@ -1,3 +1,6 @@
+##
+# Parent for all commands (Install, Upgrade, Backup)
+#
 module Redmine::Installer
   class Task
 
@@ -30,13 +33,15 @@ module Redmine::Installer
         step.up
         step.print_footer
         step.ran = true
-        puts
+        puts # new line
       end
 
       @steps.each do |id, step|
         step.final_step
       end
     rescue Redmine::Installer::Error => e
+      # Rescue from error comes from installer
+      # run steps again for cleaning
       @steps.values.reverse.each do |step|
         next unless step.ran
         step.down
