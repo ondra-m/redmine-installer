@@ -3,9 +3,9 @@ en:
   redmine_installer_summary: 'Easy way how install/upgrade redmine or plugin.'
   backup: 'Backup'
   backup_is_stored_at: 'Backup is stored at <bright>%{dir}</bright>'
-  cli_install_desc: 'Install redmine from package'
+  cli_install_desc: 'Install redmine'
   cli_show_verbose_output: 'Show verbose output'
-  cli_upgrade_desc: 'Upgrade redmine from package'
+  cli_upgrade_desc: 'Upgrade redmine'
   cli_backup_desc: 'Backup redmine'
   cli_flag_source: 'What type is package argument'
   cli_flag_branch: 'Different branch for git'
@@ -17,7 +17,7 @@ en:
   do_you_want_backup_redmine: 'Do you want backup redmine?'
   do_you_want_save_step_for_further_use: 'Do you want save steps for further use?'
   error_redmine_not_contains_all: 'Redmine root does not contains necessary folders: <bright>%{records}</bright>'
-  error_plugins_should_be_on_plugins: 'Plugin shoould be on plugins dir'
+  error_plugins_should_be_on_plugins: 'Plugin shoold be on plugins dir'
   error_argument_package_is_missing: 'Missing argument: redmine package'
   error_unsupported_source: 'Unsupported source: %{source}'
   exit: 'exit'
@@ -51,7 +51,7 @@ en:
     move_redmine:
       title: 'Moving redmine'
     webserver_config:
-      title: 'Webserve configuration'
+      title: 'Webserver configuration'
     validation:
       title: 'Validation'
     backup:
