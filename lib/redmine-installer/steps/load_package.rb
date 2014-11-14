@@ -10,7 +10,7 @@ module Redmine::Installer::Step
 
     SUPPORTED_ARCHIVE_FORMATS = ['.zip', '.gz', '.tgz']
     TAR_LONGLINK = '././@LongLink'
-    PROGRESSBAR_FORMAT = '%a |%b>%i| %p%% %t'
+    PROGRESSBAR_FORMAT = '%a [%b>%i] %p%% %t'
 
     def up
       case base.options[:source]

@@ -22,6 +22,35 @@ $ gem install redmine-installer
 
 ## Usage
 
+```
+redmine GLOBAL_ARGUMENTS ACTION ARGUMENTS
+```
+
+#### Global arguments
+
+<table>
+  <thead>
+    <tr>
+      <th>arguments</th>
+      <th>default value</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>--verbose / -v</td>
+      <td>false</td>
+      <td>show verbosed output</td>
+    </tr>
+    <tr>
+      <td>--locale / -l</td>
+      <td>en</td>
+      <td>languages for application</td>
+    </tr>
+  </tbody>
+</table>
+
+
 #### Shortcut
 
 Some commands have defined shortcut for quicker access. Fox example:
@@ -47,7 +76,7 @@ b -> backup
 <table>
   <thead>
     <tr>
-      <th>argumnest</th>
+      <th>arguments</th>
       <th>default</th>
       <th>description</th>
     </tr>
@@ -222,6 +251,12 @@ $ redmine install redmine-2.3.0.zip
 $ redmine upgrade redmine-2.5.0.zip
 ```
 
+Set languages
+
+```
+$ redmine --locale cs install redmine-2.3.0.zip
+```
+
 Install from git
 
 ```
@@ -235,3 +270,4 @@ Install from git with specific branch
 $ redmine install git@github.com:redmine/redmine.git --source git --branch 2.3-stable
 $ redmine upgrade --source git
 ```
+ 

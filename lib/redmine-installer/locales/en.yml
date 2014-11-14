@@ -96,9 +96,11 @@ en:
       apachepassenger:
         title: 'Passenger (apache)'
         configuration: |
+          Add this to apache configuration file.
+          
           <bright><VirtualHost *:80>
             ServerName www.yourhost.com
-            DocumentRoot %{redmine_root}/public    
+            DocumentRoot %{redmine_root}/public
             <Directory %{redmine_root}/public>
               # This relaxes Apache security settings.
               AllowOverride all
@@ -109,12 +111,12 @@ en:
             </Directory>
           </VirtualHost></bright>
           
-          Add this to apache configuration file.
-          
           More informations can be found at https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html
       nginxpassenger:
         title: 'Passenger (nginx)'
         configuration: |
+          Add this to nginx configuration file.
+          
           <bright>server {
             listen 80;
             server_name www.yourhost.com;
@@ -122,8 +124,6 @@ en:
             passenger_enabled on;
           }</bright>
           
-          Add this to nginx configuration file.
-        
           More informations can be found at https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html
       puma:
         title: 'Puma'

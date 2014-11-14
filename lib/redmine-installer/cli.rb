@@ -14,17 +14,26 @@ module Redmine::Installer
       version Redmine::Installer::VERSION
 
       # Global options
+
+      # Verbose
       desc I18n.translate(:cli_show_verbose_output)
       default_value false
       switch [:d, :v, :debug, :verbose], negatable: false
 
+      # Locale
+      default_value 'en'
+      flag [:l, :locale]
+
       # Before all action
-      # pre do |global_options, command, options, args|
-      #   $verbose = global_options[:debug]
-      # end
+      pre do |global_options, command, options, args|
+        $verbose = global_options[:debug]
+        I18n.locale = global_options[:locale]
+        true
+      end
 
       # Install command
       desc I18n.translate(:cli_install_desc)
+      arg :package
       command [:i, :install] do |c|
         c.flag [:s, :source], default_value: 'file',
                               must_match: ['file', 'git'],
