@@ -1,5 +1,7 @@
 # Redmine::Installer
 
+Easy way how to install/upgrade Redmine or plugin
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -20,13 +22,51 @@ Or install it yourself as:
 $ gem install redmine-installer
 ```
 
+## Examples
+
+Simple install and ugrade
+
+```
+$ wget http://www.redmine.org/releases/redmine-2.3.0.zip
+$ wget http://www.redmine.org/releases/redmine-2.5.0.zip
+
+$ redmine install redmine-2.3.0.zip
+$ redmine upgrade redmine-2.5.0.zip
+```
+
+Set languages
+
+```
+$ redmine --locale cs install redmine-2.3.0.zip
+```
+
+Install from git
+
+```
+$ redmine install git@github.com:redmine/redmine.git --source git
+$ redmine upgrade --source git
+```
+
+Install from git with specific branch
+
+```
+$ redmine install git@github.com:redmine/redmine.git --source git --branch 2.3-stable
+$ redmine upgrade --source git
+```
+
 ## Usage
 
 ```
-redmine GLOBAL_ARGUMENTS ACTION ARGUMENTS
+redmine GLOBAL_FLAGS ACTION ARGUMENTS FLAGS
 ```
 
-#### Global arguments
+See help for more details
+
+```
+redmine help
+```
+
+#### Global flags
 
 <table>
   <thead>
@@ -45,7 +85,7 @@ redmine GLOBAL_ARGUMENTS ACTION ARGUMENTS
     <tr>
       <td>--locale / -l</td>
       <td>en</td>
-      <td>languages for application</td>
+      <td>language for application</td>
     </tr>
   </tbody>
 </table>
@@ -57,9 +97,7 @@ Some commands have defined shortcut for quicker access. Fox example:
 
 ```
 redmine install package
-
 # is equal as
-
 redmine i package
 ```
 
@@ -71,7 +109,7 @@ u -> upgrade
 b -> backup
 ```
 
-#### Common arguments
+#### Common flags for all command
 
 <table>
   <thead>
@@ -86,46 +124,50 @@ b -> backup
       <td>--environment / --env / -e</td>
       <td>production</td>
       <td>
-        environment for redmine
+        environment for redmine<br>
+        you can set more environment like: <br>
+        &nbsp;&nbsp;&nbsp;<i>--env env1,env2,env3</i>
       </td>
     </tr>
   </tbody>
 </table>
 
-### Instalation
+## Install
 
-You can instal redmine package from archive or git.
+Install new redmine instance from archive or git.
 
 #### Steps:
 
-- *1. Redmine root* - where should be new redmine located
-- *2. Load package* - extract package
-- *3. Database configuration* - you can choose type of DB which you want to use
-- *4. Email sending configuration* - email sending configuration
-- *5. Install* - install commands are executed
-- *6. Moving redmine* - redmine is moved from temporarily folder to given redmine_root
-- *7. Webserve configuration* - generating webserver configuration
+- **1. Redmine root** - insert _path_ where redmine will be installed
+	- _path_ must point to the folder
+	- target folder must be writable
+- **2. Load package** - loading package to temporary folder
+- **3. Database configuration** - you can choose type of DB which you want to use
+	- currently: MySQL or PostgreSQL
+	- you can also skip this step and run migration manually
+- **4. Email sending configuration** - you can set email configuration
+- **5. Install** - install commands are executed
+- **6. Moving redmine** - redmine is moved from temporarily folder to given _redmine\_root_
+- **7. Webserve configuration** - you can generate setting from selected webserver
 
 #### From archive
 
 Supported archives are **.zip** and **.tar.gz**.
 
 ```
-# minimal
 redmine install PATH_TO_PACKAGE
 
-# full
-redmine install PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
+# with environment
+redmine install PATH_TO_PACKAGE --env environment
 ```
 
 #### From git
 
 ```
-# minimal
 redmine install GIT_REPO --source git
 
-# full
-redmine install GIT_REPO --source git --branch GIT_BRANCH --env ENV1,ENV2,ENV3
+# with specific branch
+redmine install GIT_REPO --source git --branch GIT_BRANCH --env environment
 ```
 
 ##### Arguments
@@ -133,7 +175,7 @@ redmine install GIT_REPO --source git --branch GIT_BRANCH --env ENV1,ENV2,ENV3
 <table>
   <thead>
     <tr>
-      <th>argumnest</th>
+      <th>argument</th>
       <th>default</th>
       <th>description</th>
     </tr>
@@ -143,18 +185,18 @@ redmine install GIT_REPO --source git --branch GIT_BRANCH --env ENV1,ENV2,ENV3
       <td>--branch / -b</td>
       <td>master</td>
       <td>
-        branch of git defined by GIT_REPO
+        git branch
       </td>
     </tr>
   </tbody>
 </table>
 
 
-### Upgrade
+## Upgrade
 
-You can upgrade current redmine by archive or currently defined git repository. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
+Upgrading existing instance of redmine with archive or defined git repository. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
 
-Final step will ask you if you want save steps configuration. If you say YES, configuration will be stored as profile so next time you can upgrade redmine faster.
+Final step will ask you if you want save steps configuration. If you say _YES_, configuration will be stored as profile so next time you can upgrade redmine faster.
 
 ```
 redmine upgrade PACKAGE --profile PROFILE_ID
@@ -164,37 +206,38 @@ Profiles are stored on *HOME_FOLDER/.redmine-installer-profiles.yml*.
 
 #### Steps:
 
-- *1. Redmine root* - where should be new redmine located
-- *2. Load package* - extract package
-- *3. Validation* - current redmine should be valid
-- *4. Backup* - backup current redmine (see backup section)
-- *5. Upgrading* - install commands are executed
-- *6. Moving redmine* - redmine is moved from temporarily folder to given redmine_root
-- *7. Profile saving* - generating profile (see profile section)
+- **1. Redmine root** - where is redmine located
+- **2. Load package** -  loading package to temporary folder
+- **3. Validation** - validation of current redmine
+- **4. Backup** - backup current instance
+	- **full backup**: complete _redmine\_root_ with database
+	- **backup** (default): only configuration file with database
+	- **database**: only database
+- **5. Upgrading** - upgrade commands are executed
+- **6. Moving redmine** - current redmine is upgraded by new files
+- **7. Profile saving** - generating profile (see profile section)
 
 
 #### From archive
 
 ```
-# minimal
 redmine upgrade PATH_TO_PACKAGE
 
-# full
-redmine upgrade PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
+# with environment
+redmine upgrade PATH_TO_PACKAGE --env environment
 ```
 
 #### From git
 
 ```
-# minimal
 redmine upgrade --source git
 
-# full
-redmine upgrade --source git --env ENV1,ENV2,ENV3
+# with environment
+redmine upgrade --source git --env environment
 ```
 
 
-### Backup
+## Backup
 
 ```
 redmine backup
@@ -202,10 +245,13 @@ redmine backup
 
 #### Steps:
 
-- *1. Redmine root* - where should be new redmine located
-- *2. Validation* - current redmine should be valid
-- *3. Backup* - backup current redmine (see backup section)
-- *4. Profile saving* - generating profile (see profile section)
+- **1. Redmine root** - where is redmine located
+- **2. Validation** - validation of current redmine
+- **3. Backup** - backup current instance
+	- **full backup**: complete _redmine\_root_ with database
+	- **backup** (default): only configuration file with database
+	- **database**: only database
+- **4. Profile saving** - generating profile (see profile section)
 
 You can choose one of 3 types.
 
@@ -239,35 +285,5 @@ You can choose one of 3 types.
   </tbody>
 </table>
 
-## Examples
 
-Simple install and ugrade
-
-```
-$ wget http://www.redmine.org/releases/redmine-2.3.0.zip
-$ wget http://www.redmine.org/releases/redmine-2.5.0.zip
-
-$ redmine install redmine-2.3.0.zip
-$ redmine upgrade redmine-2.5.0.zip
-```
-
-Set languages
-
-```
-$ redmine --locale cs install redmine-2.3.0.zip
-```
-
-Install from git
-
-```
-$ redmine install git@github.com:redmine/redmine.git --source git
-$ redmine upgrade --source git
-```
-
-Install from git with specific branch
-
-```
-$ redmine install git@github.com:redmine/redmine.git --source git --branch 2.3-stable
-$ redmine upgrade --source git
-```
  
