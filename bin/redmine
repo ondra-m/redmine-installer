@@ -5,4 +5,5 @@ $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'redmine-installer'
 
+Redmine::Installer.print_logo
 Redmine::Installer::CLI.start(ARGV)

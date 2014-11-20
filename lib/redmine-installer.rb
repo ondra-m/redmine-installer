@@ -68,4 +68,3 @@ require 'redmine-installer/backup'
 
 # Default configurations
 Redmine::Installer.set_i18n
-Redmine::Installer.print_logo
