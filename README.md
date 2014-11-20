@@ -130,7 +130,7 @@ b -> backup
   </tbody>
 </table>
 
-### Instalation
+## Install
 
 Install new redmine instance from archive or git.
 
@@ -190,7 +190,7 @@ redmine install GIT_REPO --source git --branch GIT_BRANCH --env environment
 </table>
 
 
-### Upgrade
+## Upgrade
 
 Upgrading existing instance of redmine with archive or defined git repository. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
 
@@ -235,7 +235,7 @@ redmine upgrade --source git --env environment
 ```
 
 
-### Backup
+## Backup
 
 ```
 redmine backup
