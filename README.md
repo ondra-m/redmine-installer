@@ -1,5 +1,7 @@
 # Redmine::Installer
 
+Easy way how to install/upgrade Redmine or plugin
+
 ## Installation
 
 Add this line to your application's Gemfile:
