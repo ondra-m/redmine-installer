@@ -48,6 +48,8 @@ module Redmine::Installer
         unless success
           if confirm(:do_you_want_repeat_command, false)
             return run(*_args)
+          else
+            raise Redmine::Installer::Error, I18n.translate(:command_exit_with_error, command: command)
           end
         end
 
