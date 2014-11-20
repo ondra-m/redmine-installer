@@ -143,7 +143,7 @@ module Redmine::Installer::Plugin
 
     class PostgreSQL < Database
       def self.adapter_name
-        'pg'
+        'postgresql'
       end
 
       def initialize
@@ -152,7 +152,7 @@ module Redmine::Installer::Plugin
       end
 
       def command(comm, file)
-        %{PGPASSWORD="#{get('password')}" #{comm} -i -h #{get('host')} -p #{get('port')} -U #{get('username')} -Fc -f #{file}}
+        %{PGPASSWORD="#{get('password')}" #{comm} -i -h #{get('host')} -p #{get('port')} -U #{get('username')} -Fc -f #{file} #{get('database')}}
       end
 
       def command_for_backup(file)
