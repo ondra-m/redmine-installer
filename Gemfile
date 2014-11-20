@@ -3,11 +3,12 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in redmine-installer.gemspec
 gemspec
 
+gem 'ansi'
 gem 'gli'
 gem 'i18n'
-gem 'ansi'
 gem 'notifier'
 gem 'ruby-progressbar'
+gem 'rubyzip'
 
 group :development do
   gem 'pry'

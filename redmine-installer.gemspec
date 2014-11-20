@@ -20,9 +20,12 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "gli"
   spec.add_runtime_dependency "ansi"
+  spec.add_runtime_dependency "gli"
+  spec.add_runtime_dependency "i18n"
   spec.add_runtime_dependency "notifier"
+  spec.add_runtime_dependency "ruby-progressbar"
+  spec.add_runtime_dependency "rubyzip"
 
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"

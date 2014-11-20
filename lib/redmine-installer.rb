@@ -57,7 +57,6 @@ module Redmine
 end
 
 # Requirements
-require 'pry'
 require 'i18n'
 require 'redmine-installer/version'
 require 'redmine-installer/error'
