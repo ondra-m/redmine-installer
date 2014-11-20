@@ -45,7 +45,7 @@ module Redmine::Installer::Plugin
       @params.add('database')
       @params.add('host').default('localhost')
       @params.add('username')
-      @params.add('password')
+      @params.add('password').hide(true)
       @params.add('encoding').default('utf8')
     end
 

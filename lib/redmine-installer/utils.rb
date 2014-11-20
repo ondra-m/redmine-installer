@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'notifier'
 require 'ansi'
+require 'io/console'
 
 module Redmine::Installer
   module Utils
@@ -113,8 +114,14 @@ module Redmine::Installer
       end
 
       # Instead of `super` take only what I need
-      def gets
-        $stdin.gets.to_s.chomp
+      def gets(hide=false)
+        if hide
+          input = $stdin.noecho{|io| io.gets}.to_s.chomp
+          $stdout.puts # noecho is also for enter
+          input
+        else
+          $stdin.gets.to_s.chomp
+        end
       end
 
       # Asking on 1 line
@@ -134,7 +141,7 @@ module Redmine::Installer
         end
 
         say(message)
-        input = gets
+        input = gets(options[:hide])
 
         # Ctrl-D or enter was pressed
         return default if input.empty?

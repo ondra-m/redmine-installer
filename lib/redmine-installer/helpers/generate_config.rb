@@ -18,7 +18,7 @@ module Redmine::Installer::Helper
 
       say("(#{instance.class.title})", 2)
       instance.params.for_asking.each do |p|
-        p.value = ask(p.title, default: p.default)
+        p.value = ask(p.title, default: p.default, hide: p.hide)
       end
 
       instance.make_config(base.tmp_redmine_root)

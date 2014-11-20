@@ -60,6 +60,7 @@ module Redmine::Installer
     attribute :default
     attribute :value
     attribute :ask, true
+    attribute :hide, false
 
     def initialize(name)
       # Default
@@ -77,6 +78,7 @@ module Redmine::Installer
 
     def set(key, value)
       self.send("#{key}=", value)
+      self
     end
 
     def default(value=nil)
@@ -84,6 +86,14 @@ module Redmine::Installer
 
       self.default = value
       self.value = value if self.value.nil?
+      self
+    end
+
+    def hide(value=nil)
+      return @hide if value.nil?
+
+      self.hide = value
+      self
     end
 
   end
