@@ -30,7 +30,9 @@ module Redmine::Installer::Step
         command.rake_generate_secret_token(base.env)
 
         # Other plugins can have post-install procedure
-        plugin::RedminePlugin.all.each(&:upgrade)
+        plugin::RedminePlugin.all.each do |plugin|
+          plugin.upgrade(base)
+        end
       end
 
       # Delete content of redmine_root

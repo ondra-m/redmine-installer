@@ -13,7 +13,9 @@ module Redmine::Installer::Step
         command.rake_generate_secret_token(base.env)
 
         # Other plugins can have post-install procedure
-        plugin::RedminePlugin.all.each(&:install)
+        plugin::RedminePlugin.all.each do |plugin|
+          plugin.install(base)
+        end
       end
     end
 
