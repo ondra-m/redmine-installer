@@ -8,7 +8,7 @@ module Redmine::Installer::Plugin
     def initialize
       @params = Redmine::Installer::ConfigParams.new
       @params.add('user_name')
-      @params.add('password')
+      @params.add('password').hide(true)
     end
 
     def build
