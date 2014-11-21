@@ -26,7 +26,10 @@ module Redmine::Installer::Step
     end
 
     def down
-      database_restore if @database_backed_up
+      if @database_backed_up
+        say(:restoring_database)
+        database_restore
+      end
     end
 
     def final_step

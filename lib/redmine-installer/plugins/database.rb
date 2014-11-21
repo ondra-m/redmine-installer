@@ -35,7 +35,9 @@ module Redmine::Installer::Plugin
     end
 
     def self.restore_all(redmine_root, backup_dir)
-      load_all(redmine_root).each do |klass|
+      databases = load_all(redmine_root)
+      databases.uniq! {|d| d.params['database'].value}
+      databases.each do |klass|
         klass.restore(backup_dir)
       end
     end
@@ -102,6 +104,7 @@ module Redmine::Installer::Plugin
       # More enviroments can use the same database
       return unless File.exist?(file)
 
+      Kernel.system(command_for_empty)
       Kernel.system(command_for_restore(file))
     end
 
@@ -126,6 +129,10 @@ module Redmine::Installer::Plugin
 
       def command_args
         "-h #{params['host'].value} -P #{get('port')} -u #{get('username')} -p#{get('password')} #{get('database')}"
+      end
+
+      def command_for_empty
+        "mysql #{command_args} -e 'drop database #{get('database')}; create database #{get('database')};'"
       end
 
       def command_for_backup(file)
@@ -153,6 +160,11 @@ module Redmine::Installer::Plugin
 
       def command(comm, file)
         %{PGPASSWORD="#{get('password')}" #{comm} -i -h #{get('host')} -p #{get('port')} -U #{get('username')} -Fc -f #{file} #{get('database')}}
+      end
+
+      def command_for_empty
+        # %{PGPASSWORD="#{get('password')}" psql -i -h #{get('host')} -p #{get('port')} -U #{get('username')} -c 'drop database #{get('database')}; create database #{get('database')};'}
+        ''
       end
 
       def command_for_backup(file)
