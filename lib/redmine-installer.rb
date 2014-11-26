@@ -65,6 +65,3 @@ require 'redmine-installer/ext/module'
 require 'redmine-installer/install'
 require 'redmine-installer/upgrade'
 require 'redmine-installer/backup'
-
-# Default configurations
-Redmine::Installer.set_i18n
