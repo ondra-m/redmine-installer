@@ -32,13 +32,24 @@ class EasyProject < Redmine::Installer::Plugin::RedminePlugin
     end
   end
 
-  RAKE_EASYPROJECT_INSTALL = 'bundle exec rake  RAILS_ENV=production'
-
   def self.install(base)
     command.rake_easyproject_install(base.env) if am_i_there?
   end
 
   def self.upgrade(base)
+    # Copy client modification folders
+    # plugins/easyproject/easy_plugins/modification_*
+    unless base.options['skip-old-modifications']
+      easy_plugins_dir = File.join('plugins', 'easyproject', 'easy_plugins')
+      old_modifications = Dir.glob(File.join(base.redmine_root, easy_plugins_dir, 'modification_*'))
+      new_modifications = Dir.glob(File.join(base.tmp_redmine_root, easy_plugins_dir, 'modification_*'))
+
+      # Modifications which are on old redmine but not new
+      missing_modifications = old_modifications - new_modifications
+
+      FileUtils.cp_r(missing_modifications, File.join(base.tmp_redmine_root, easy_plugins_dir))
+    end
+
     install(base)
   end
 end

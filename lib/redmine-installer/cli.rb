@@ -64,6 +64,8 @@ module Redmine::Installer
                                          desc: I18n.translate(:cli_flag_environment),
                                          type: Array
 
+        c.switch 'skip-old-modifications', default_value: false
+
         c.action do |global_options, options, args|
           run_action('upgrade', args.first, options)
         end

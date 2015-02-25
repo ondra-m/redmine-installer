@@ -236,6 +236,10 @@ redmine upgrade --source git
 redmine upgrade --source git --env environment
 ```
 
+### Easyproject
+
+If you are using easyproject plugin and you dont want copy client modifications from old instance use switch `--skip-old-modifications`.
+
 
 ## Backup
 
@@ -284,6 +288,3 @@ You can choose one of 3 types.
     </tr>
   </tbody>
 </table>
-
-
- 
