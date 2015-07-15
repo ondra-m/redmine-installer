@@ -6,7 +6,7 @@
 # plugins will be kept otherwise are replaced with those from package.
 #
 # Final step will ask you if you want save steps configuration.
-# If you say YES, configuration will be stored as profile so next time 
+# If you say YES, configuration will be stored as profile so next time
 # you can upgrade redmine faster.
 #
 # redmine upgrade PACKAGE --profile PROFILE_ID
@@ -41,6 +41,7 @@ module Redmine::Installer
   class Upgrade < Task
 
     STEPS = [
+      step::EnvCheck,
       step::RedmineRoot,
       step::LoadPackage,
       step::Validation,
