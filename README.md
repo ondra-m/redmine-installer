@@ -27,31 +27,22 @@ $ gem install redmine-installer
 Simple install and ugrade
 
 ```
+# From archive
 $ wget http://www.redmine.org/releases/redmine-2.3.0.zip
 $ wget http://www.redmine.org/releases/redmine-2.5.0.zip
 
 $ redmine install redmine-2.3.0.zip
 $ redmine upgrade redmine-2.5.0.zip
+
+# From website
+$ redmine install v2.3.0
+$ redmine upgrade v2.5.0
 ```
 
 Set languages
 
 ```
 $ redmine --locale cs install redmine-2.3.0.zip
-```
-
-Install from git
-
-```
-$ redmine install git@github.com:redmine/redmine.git --source git
-$ redmine upgrade --source git
-```
-
-Install from git with specific branch
-
-```
-$ redmine install git@github.com:redmine/redmine.git --source git --branch 2.3-stable
-$ redmine upgrade --source git
 ```
 
 ## Usage
@@ -134,7 +125,7 @@ b -> backup
 
 ## Install
 
-Install new redmine instance from archive or git.
+Install new redmine instance from archive or website.
 
 #### Steps:
 
@@ -161,40 +152,9 @@ redmine install PATH_TO_PACKAGE
 redmine install PATH_TO_PACKAGE --env environment
 ```
 
-#### From git
-
-```
-redmine install GIT_REPO --source git
-
-# with specific branch
-redmine install GIT_REPO --source git --branch GIT_BRANCH --env environment
-```
-
-##### Arguments
-
-<table>
-  <thead>
-    <tr>
-      <th>argument</th>
-      <th>default</th>
-      <th>description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>--branch / -b</td>
-      <td>master</td>
-      <td>
-        git branch
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-
 ## Upgrade
 
-Upgrading existing instance of redmine with archive or defined git repository. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
+Upgrading existing instance of redmine with archive or defined version. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
 
 Final step will ask you if you want save steps configuration. If you say _YES_, configuration will be stored as profile so next time you can upgrade redmine faster.
 
@@ -225,15 +185,6 @@ redmine upgrade PATH_TO_PACKAGE
 
 # with environment
 redmine upgrade PATH_TO_PACKAGE --env environment
-```
-
-#### From git
-
-```
-redmine upgrade --source git
-
-# with environment
-redmine upgrade --source git --env environment
 ```
 
 ### Easyproject
