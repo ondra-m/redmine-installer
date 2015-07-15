@@ -44,8 +44,10 @@ module Redmine::Installer
         step.final
       end
 
-      Redmine::Installer::Plugin::RedminePlugin.all.each do |plugin|
-        plugin.final(self)
+      Dir.chdir(redmine_root) do
+        Redmine::Installer::Plugin::RedminePlugin.all.each do |plugin|
+          plugin.final(self)
+        end
       end
     rescue Redmine::Installer::Error => e
       # Rescue from error comes from installer

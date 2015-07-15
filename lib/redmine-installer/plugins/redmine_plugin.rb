@@ -59,8 +59,12 @@ class EasyProject < Redmine::Installer::Plugin::RedminePlugin
   def self.final(base)
     return unless am_i_there?
 
-    say %{<bright>EasyRedmine notes:</bright>
-  You should create a maintenance task to CRON (on Linux) or Scheduled Tasks (on Windows) that will be running every 5-15 minutes. This one task aggregates all required tasks such as mail receiving, alerts evaluation etc. You should set up required parameters via administration -> scheduled tasks.
+    say %{
+<bright>EasyRedmine notes:</bright>
+  You should create a maintenance task to CRON (on Linux) or Scheduled Tasks (on Windows)
+  that will be running every 5-15 minutes. This one task aggregates all required tasks
+  such as mail receiving, alerts evaluation etc. You should set up required parameters via
+  administration -> scheduled tasks.
   Do not run this task under root, use same user that is used for web server.:
 
   <bright>bundle exec rake easyproject:scheduler:run_tasks RAILS_ENV=production</bright>
@@ -71,6 +75,8 @@ class EasyProject < Redmine::Installer::Plugin::RedminePlugin
 
   2. Add:
     */15 * * * * cd #{base.redmine_root} && bundle exec rake easyproject:scheduler:run_tasks RAILS_ENV=production
-    }
+
+
+}
   end
 end
