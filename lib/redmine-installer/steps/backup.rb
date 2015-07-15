@@ -32,7 +32,7 @@ module Redmine::Installer::Step
       end
     end
 
-    def final_step
+    def final
       if @current_backup_dir
         say t(:backup_is_stored_at, dir: @current_backup_dir), 2
       end

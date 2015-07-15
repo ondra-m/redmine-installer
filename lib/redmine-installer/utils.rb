@@ -5,7 +5,7 @@ require 'io/console'
 
 module Redmine::Installer
   module Utils
-    
+
     def self.included(base)
       base.send :extend,  Methods
       base.send :include, Methods
@@ -67,6 +67,14 @@ module Redmine::Installer
       # Check if there are plugins in plugin dir
       def some_plugins?
         Dir.glob(File.join('plugins', '*')).select{|record| File.directory?(record)}.any?
+      end
+
+      def windows?
+        RbConfig::CONFIG['host_os'] =~ /mswin|mingw/
+      end
+
+      def root?
+        Process.euid == 0
       end
 
 
