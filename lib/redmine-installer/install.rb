@@ -16,24 +16,19 @@
 #
 # From archive::
 #   Supported archives are .zip and .tar.gz.
-# => 
+#
 #   # minimal
-#   redmine upgrade PATH_TO_PACKAGE
+#   redmine install PATH_TO_PACKAGE
+#   redmine install REDMINE_VERSION
 #
 #   # full
-#   redmine upgrade PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
-#
-# From git::
-#   # minimal
-#   redmine upgrade GIT_REPO --source git
-#
-#   # full
-#   redmine upgrade GIT_REPO --source git --env ENV1,ENV2,ENV3
+#   redmine install PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
 #
 module Redmine::Installer
   class Install < Task
 
     STEPS = [
+      step::EnvCheck,
       step::RedmineRoot,
       step::LoadPackage,
       step::DatabaseConfig,

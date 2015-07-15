@@ -1,8 +1,8 @@
-
 en:
   redmine_installer_summary: 'Easy way how install/upgrade redmine or plugin.'
   backup: 'Backup'
   backup_is_stored_at: 'Backup is stored at <bright>%{dir}</bright>'
+  cannot_download_redmine_version: 'Cannot download redmine %{version}'
   cli_install_desc: 'Install redmine'
   cli_show_verbose_output: 'Show verbose output'
   cli_upgrade_desc: 'Upgrade redmine'
@@ -32,6 +32,8 @@ en:
   only_database: 'Only database'
   path_for_redmine_root: 'Path for redmine_root'
   powered_by: 'Powered by EasyRedmine'
+  redmine_downloading: 'Redmine downloading'
+  redmine_was_installed_to: 'Redmine was installed to %{dir}'
   restoring_database: '... Restoring database'
   skip: 'Skip'
   try_again: 'try again'
@@ -40,6 +42,8 @@ en:
   what_web_server_do_you_want: 'What web-server do you want?'
   yes_t: 'yes'
   your_profile_can_be_used_as: 'Your profile is saved as #%{id} and can be use with <bright>--profile %{id}</bright>'
+  installer_run_as_root: 'Installer run as root. This can be dangerous. Continue?'
+  terminated_by_user: Terminated by user.
 
   step:
     load_package:
@@ -63,7 +67,9 @@ en:
     save_profile:
       title: 'Saving profile'
     redmine_root:
-      title: 'Redmine root'
+      title: 'Getting a redmine root'
+    env_check:
+      title: 'Environment checking'
 
   plugin:
     database:
@@ -89,17 +95,17 @@ en:
         configuration: |
           Add:
             <bright>gem 'thin'</bright>
-          
+
           to <bright>Gemfile.local</bright>
-          
+
           and run: <bright>bundle install</bright>
-          
+
           (More informations can be found at http://code.macournoyer.com/thin)
       apachepassenger:
         title: 'Passenger (apache)'
         configuration: |
           Add this to apache configuration file.
-          
+
           <bright><VirtualHost *:80>
             ServerName www.yourhost.com
             DocumentRoot %{redmine_root}/public
@@ -112,29 +118,29 @@ en:
               #Require all granted
             </Directory>
           </VirtualHost></bright>
-          
+
           More informations can be found at https://www.phusionpassenger.com/documentation/Users%20guide%20Apache.html
       nginxpassenger:
         title: 'Passenger (nginx)'
         configuration: |
           Add this to nginx configuration file.
-          
+
           <bright>server {
             listen 80;
             server_name www.yourhost.com;
             root %{redmine_root}/public;   # <--- be sure to point to 'public'!
             passenger_enabled on;
           }</bright>
-          
+
           More informations can be found at https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html
       puma:
         title: 'Puma'
         configuration: |
           Add:
             <bright>gem 'puma'</bright>
-          
+
           to <bright>Gemfile.local</bright>
-          
+
           More informations can be found at http://puma.io
     redmine_plugin:
       easyproject:

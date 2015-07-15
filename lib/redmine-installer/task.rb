@@ -27,17 +27,25 @@ module Redmine::Installer
     end
 
     def run
-      @steps.each do |id, step|
+      @steps.each do |_, step|
+        step.prepare
+      end
+
+      @steps.each do |_, step|
         step.print_title
         step.print_header
         step.up
         step.print_footer
         step.ran = true
-        puts # new line
+        puts
       end
 
-      @steps.each do |id, step|
-        step.final_step
+      @steps.each do |_, step|
+        step.final
+      end
+
+      Redmine::Installer::Plugin::RedminePlugin.all.each do |plugin|
+        plugin.final(self)
       end
     rescue Redmine::Installer::Error => e
       # Rescue from error comes from installer

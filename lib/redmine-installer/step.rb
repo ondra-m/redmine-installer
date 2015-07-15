@@ -11,5 +11,6 @@ module Redmine::Installer
     autoload :Backup,          'redmine-installer/steps/backup'
     autoload :Upgrade,         'redmine-installer/steps/upgrade'
     autoload :RedmineRoot,     'redmine-installer/steps/redmine_root'
+    autoload :EnvCheck,        'redmine-installer/steps/env_check'
   end
 end

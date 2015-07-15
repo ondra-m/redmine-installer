@@ -1,4 +1,20 @@
 module Redmine::Installer::Step
+  ##
+  # Base
+  #
+  # == Steps:
+  # prepare::
+  #   used for argument validation
+  #
+  # up::
+  #   actions
+  #
+  # final::
+  #   for printing informations
+  #
+  # down::
+  #   if something went wrong
+  #
   class Base
 
     include Redmine::Installer::Utils
@@ -29,10 +45,13 @@ module Redmine::Installer::Step
     def print_footer
     end
 
-    def final_step
+    def prepare
     end
 
     def up
+    end
+
+    def final
     end
 
     def down

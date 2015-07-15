@@ -1,9 +1,11 @@
 require 'rubygems/package'
 require 'ruby-progressbar'
 require 'fileutils'
-require 'zip'
+require 'net/http'
 require 'tmpdir'
 require 'zlib'
+require 'zip'
+require 'uri'
 
 module Redmine::Installer::Step
   class LoadPackage < Base
@@ -12,32 +14,55 @@ module Redmine::Installer::Step
     TAR_LONGLINK = '././@LongLink'
     PROGRESSBAR_FORMAT = '%a [%b>%i] %p%% %t'
 
-    def up
+    def prepare
       case base.options[:source]
       when 'file'
-        load_file
+
+        unless File.exist?(base.package)
+          if base.package =~ /\Av?(\d\.\d\.\d)\Z/
+            download_redmine($1)
+          end
+        end
+
+        unless File.exist?(base.package)
+          error :file_not_exist, file: base.package
+        end
+
+        @type = File.extname(base.package)
+        unless SUPPORTED_ARCHIVE_FORMATS.include?(@type)
+          error :file_must_have_format, file: base.package, formats: SUPPORTED_ARCHIVE_FORMATS.join(', ')
+        end
+
       when 'git'
-        load_git
+        nil
       else
         error :error_unsupported_source, source: base.options[:source]
       end
     end
 
-    def final_step
-      # Delete tmp_redmine_root
+    def up
+      case base.options[:source]
+      when 'file'
+        load_from_archive
+      when 'git'
+        load_from_git
+      end
+    end
+
+    def down
       FileUtils.remove_entry_secure(@tmpdir) if @tmpdir
+      FileUtils.safe_unlink(@tmpfile) if @tmpfile
+    end
+
+    def final
+      down
+      say(t(:redmine_was_installed_to, dir: base.redmine_root), 1)
     end
 
     private
 
       # =======================================================================
       # General
-
-      def create_tmp_dir
-        @tmpdir = Dir.mktmpdir
-      rescue
-        FileUtils.remove_entry_secure(@tmpdir)
-      end
 
       # Move files from temp dir to target. First check
       # if folder contains redmine or contains
@@ -67,16 +92,7 @@ module Redmine::Installer::Step
       # =======================================================================
       # File
 
-      def load_file
-        unless File.exist?(base.package)
-          error :file_not_exist, file: base.package
-        end
-
-        @type = File.extname(base.package)
-        unless SUPPORTED_ARCHIVE_FORMATS.include?(@type)
-          error :file_must_have_format, file: base.package, formats: SUPPORTED_ARCHIVE_FORMATS.join(', ')
-        end
-
+      def load_from_archive
         # Make temp directory and extract archive + move it to the redmine_folder
         extract_to_tmp
 
@@ -84,8 +100,38 @@ module Redmine::Installer::Step
         get_tmp_redmine_root
       end
 
+      def download_redmine(version)
+        @tmpfile = Tempfile.new(['redmine', '.zip'])
+        @tmpfile.binmode
+
+        uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
+
+        Net::HTTP.start(uri.host, uri.port) do |http|
+          head = http.request_head(uri)
+
+          unless head.is_a?(Net::HTTPSuccess)
+            error :cannot_download_redmine_version, version: version
+          end
+
+          say(:redmine_downloading, 1)
+          progressbar = ProgressBar.create(format: PROGRESSBAR_FORMAT, total: head['content-length'].to_i)
+
+          http.get(uri) do |data|
+            @tmpfile.write(data)
+            progressbar.progress += data.size
+          end
+
+          progressbar.finish
+          say(nil, 1)
+        end
+
+        @tmpfile.close
+
+        base.package = @tmpfile.path
+      end
+
       def extract_to_tmp
-        create_tmp_dir
+        @tmpdir = Dir.mktmpdir
 
         case @type
         when '.zip'
@@ -112,10 +158,10 @@ module Redmine::Installer::Step
 
       # Extract .tar.gz archive
       # based on http://dracoater.blogspot.cz/2013/10/extracting-files-from-targz-with-ruby.html
-      # 
-      # Originally tar did not support paths longer than 100 chars. GNU tar is better and they 
-      # implemented support for longer paths, but it was made through a hack called ././@LongLink. 
-      # Shortly speaking, if you stumble upon an entry in tar archive which path equals to above 
+      #
+      # Originally tar did not support paths longer than 100 chars. GNU tar is better and they
+      # implemented support for longer paths, but it was made through a hack called ././@LongLink.
+      # Shortly speaking, if you stumble upon an entry in tar archive which path equals to above
       # mentioned ././@LongLink, that means that the following entry path is longer than 100 chars and
       # is truncated. The full path of the following entry is actually the value of the current entry.
       #
@@ -158,8 +204,8 @@ module Redmine::Installer::Step
       # =======================================================================
       # Git
 
-      def load_git
-        create_tmp_dir
+      def load_from_git
+        @tmpdir = Dir.mktmpdir
 
         # Package is remote url to git repository
         remote = base.package
