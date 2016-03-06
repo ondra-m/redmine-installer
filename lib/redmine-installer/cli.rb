@@ -1,91 +1,62 @@
-require 'gli'
-
-module Redmine::Installer
+module RedmineInstaller
   class CLI
-    extend GLI::App
+    include Commander::Methods
 
-    def self.spec
-      @spec ||= Gem::Specification::load('redmine-installer.gemspec')
-    end
+    def run
+      program :name, 'Ruby installer'
+      program :version, RedmineInstaller::VERSION
+      program :description, 'Easy way how install/upgrade redmine or plugin.'
 
-    def self.start(argv)
-      # Program settings
-      program_desc I18n.translate(:redmine_installer_summary)
-      version Redmine::Installer::VERSION
+      global_option('-d', '--debug', 'Logging message to stdout'){ $DEBUG = true }
+      default_command :help
 
-      # Global options
 
-      # Verbose
-      desc I18n.translate(:cli_show_verbose_output)
-      default_value false
-      switch [:d, :v, :debug, :verbose], negatable: false
+      # --- Install -----------------------------------------------------------
+      command :install do |c|
+        c.syntax = 'install [PACKAGE] [REDMINE_ROOT] [options]'
+        c.description = 'Install redmine or easyredmine'
 
-      # Locale
-      default_value 'en'
-      flag [:l, :locale]
+        c.example 'Install from archive',
+                  'redmine install ~/REDMINE_PACKAGE.zip'
+        c.example 'Install specific version from internet',
+                  'redmine install v3.1.0'
+        c.example 'Install package to new dir',
+                  'redmine install ~/REDMINE_PACKAGE.zip redmine_root'
 
-      # Before all action
-      pre do |global_options, command, options, args|
-        $verbose = global_options[:debug]
-        I18n.locale = global_options[:locale]
-        true
-      end
+        c.option '--enable-user-root', 'Skip root as root validation'
+        c.option '--bundle-options', String, 'Add options to bundle command'
 
-      # Install command
-      desc I18n.translate(:cli_install_desc)
-      arg :package
-      command [:i, :install] do |c|
-        c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git'],
-                              desc: I18n.translate(:cli_flag_source)
+        c.action do |args, options|
+          options.default(enable_user_root: false)
 
-        c.flag [:b, :branch], default_value: 'master',
-                              desc: I18n.translate(:cli_flag_branch)
-
-        c.flag [:e, :env, :environment], default_value: ['production'],
-                                         desc: I18n.translate(:cli_flag_environment),
-                                         type: Array
-
-        c.action do |global_options, options, args|
-          run_action('install', args.first, options)
+          RedmineInstaller::Install.new(args[0], args[1], options.__hash__).run
         end
       end
+      alias_command :i, :install
 
-      # Upgrade command
-      desc I18n.translate(:cli_upgrade_desc)
-      arg :package
-      command [:u, :upgrade] do |c|
-        c.flag [:p, :profile]
-        c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git'],
-                              desc: I18n.translate(:cli_flag_source)
 
-        c.flag [:e, :env, :environment], default_value: ['production'],
-                                         desc: I18n.translate(:cli_flag_environment),
-                                         type: Array
+      # --- Upgrade -----------------------------------------------------------
+      command :upgrade do |c|
+        c.syntax = 'upgrade [PACKAGE] [REDMINE_ROOT] [options]'
+        c.description = 'Upgrade redmine or easyredmine'
 
-        c.switch 'skip-old-modifications', default_value: false
+        c.example 'Upgrade with new package',
+                  'redmine upgrade ~/REDMINE_PACKAGE.zip'
+        c.example 'Upgrade',
+                  'redmine upgrade ~/REDMINE_PACKAGE.zip redmine_root'
 
-        c.action do |global_options, options, args|
-          run_action('upgrade', args.first, options)
+        c.option '--enable-user-root', 'Skip root as root validation'
+        c.option '--bundle-options', String, 'Add options to bundle command'
+
+        c.action do |args, options|
+          options.default(enable_user_root: false)
+
+          RedmineInstaller::Upgrade.new(args[0], args[1], options.__hash__).run
         end
       end
+      alias_command :u, :upgrade
 
-      # Backup command
-      desc I18n.translate(:cli_backup_desc)
-      arg :redmine_root
-      command [:b, :backup] do |c|
-        c.flag [:p, :profile]
-        c.action do |global_options, options, args|
-          run_action('backup', args.first, options)
-        end
-      end
-
-      run(argv)
-    end
-
-    def self.run_action(action, *args)
-      Redmine::Installer.const_get(action.capitalize).new(*args).run
+      run!
     end
 
   end

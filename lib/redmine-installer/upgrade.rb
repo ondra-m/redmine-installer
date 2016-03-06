@@ -1,68 +1,43 @@
-##
-# Backup redmine
-#
-# You can upgrade current redmine by archive or currently defined git repository.
-# If your redmine contain plugins which are not part of new package - all these
-# plugins will be kept otherwise are replaced with those from package.
-#
-# Final step will ask you if you want save steps configuration.
-# If you say YES, configuration will be stored as profile so next time
-# you can upgrade redmine faster.
-#
-# redmine upgrade PACKAGE --profile PROFILE_ID
-# Profiles are stored on HOME_FOLDER/.redmine-installer-profiles.yml.
-#
-# == Steps:
-# 1. Redmine root - where should be new redmine located
-# 2. Load package - extract package
-# 3. Validation - current redmine should be valid
-# 4. Backup - backup current redmine (see backup section)
-# 5. Upgrading - install commands are executed
-# 6. Moving redmine - redmine is moved from temporarily folder to given redmine_root
-# 7. Profile saving - generating profile (see profile section)
-#
-# == Usage:
-#
-# From archive::
-#   # minimal
-#   redmine upgrade PATH_TO_PACKAGE
-#
-#   # full
-#   redmine upgrade PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
-#
-# From git::
-#   # minimal
-#   redmine upgrade --source git
-#
-#   # full
-#   redmine upgrade --source git --env ENV1,ENV2,ENV3
-#
-module Redmine::Installer
+module RedmineInstaller
   class Upgrade < Task
 
-    STEPS = [
-      step::EnvCheck,
-      step::RedmineRoot,
-      step::LoadPackage,
-      step::Validation,
-      step::Backup,
-      step::Upgrade,
-      step::MoveRedmine
-    ]
+    def up
+      @environment.check
+      @target_redmine.ensure_valid_root
+      @target_redmine.validate
+      @package.ensure_valid_package
+      @package.extract
 
-    attr_accessor :package
+      @temp_redmine.root = @package.redmine_root
 
-    def initialize(package, options={})
-      self.package = package
-      super(options)
+      @target_redmine.make_backup
 
-      check_package if options[:source] == 'file'
-    end
+      @temp_redmine.copy_instance_files_from(@target_redmine)
+      @temp_redmine.copy_missing_plugins_from(@target_redmine)
 
-    def run
-      Redmine::Installer::Profile.load(self, options[:profile])
-      super
-      Redmine::Installer::Profile.save(self) if options[:profile].nil?
+      begin
+        @temp_redmine.upgrade
+      rescue => e
+        if @target_redmine.database && @target_redmine.database.backuped?
+          if prompt.yes?("Upgrade failed. Do you want restore database backup?", default: true)
+            @target_redmine.database.restore_from_backup
+            puts 'Database restored'
+            logger.info('Database restored')
+          else
+            logger.warn('Upgrade failed but restore was rejected')
+          end
+        end
+
+        error('Upgrade failed')
+      end
+
+      @target_redmine.delete_root
+      @target_redmine.copy_root(@temp_redmine)
+
+      @package.clean_up
+
+      puts pastel.bold('Redmine was upgraded')
+      logger.info('Redmine was upgraded')
     end
 
   end

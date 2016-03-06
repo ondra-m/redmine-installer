@@ -1,62 +1,78 @@
-module Redmine
-  module Installer
-    autoload :CLI,          'redmine-installer/cli'
-    autoload :Task,         'redmine-installer/task'
-    autoload :Utils,        'redmine-installer/utils'
-    autoload :Step,         'redmine-installer/step'
-    autoload :ConfigParams, 'redmine-installer/config_param'
-    autoload :Plugin,       'redmine-installer/plugin'
-    autoload :Helper,       'redmine-installer/helper'
-    autoload :Command,      'redmine-installer/command'
-    autoload :Exec,         'redmine-installer/exec'
-    autoload :Profile,      'redmine-installer/profile'
-    autoload :Git,          'redmine-installer/git'
+require 'fileutils'
+require 'tempfile'
+require 'ostruct'
+require 'tmpdir'
+require 'pastel'
+require 'yaml'
 
-    # Root of the gem
-    def self.root_path
-      @root_path ||= File.expand_path('..', File.dirname(__FILE__))
-    end
+require 'tty-progressbar'
+require 'tty-prompt'
+require 'commander'
 
-    # Path to locales dir
-    def self.locales_path
-      @locales_path ||= File.join(root_path, 'lib', 'redmine-installer', 'locales')
-    end
+require 'pry'
 
-    # Locales for I18n
-    def self.locales
-      @locales ||= Dir.glob(File.join(locales_path, '*.yml'))
-    end
+module RedmineInstaller
+  # Includes
+  autoload :CLI, 'redmine-installer/cli'
+  autoload :Task, 'redmine-installer/task'
+  autoload :Install, 'redmine-installer/install'
+  autoload :Utils, 'redmine-installer/utils'
+  autoload :Logger, 'redmine-installer/logger'
+  autoload :Modules, 'redmine-installer/modules'
+  autoload :Environment, 'redmine-installer/environment'
+  autoload :Redmine, 'redmine-installer/redmine'
+  autoload :Package, 'redmine-installer/package'
+  autoload :Database, 'redmine-installer/database'
+  autoload :Configuration, 'redmine-installer/configuration'
+  autoload :Upgrade, 'redmine-installer/upgrade'
 
-    # Default configurations fo I18n gem
-    def self.set_i18n
-      I18n.enforce_available_locales = false
-      I18n.load_path = Redmine::Installer.locales
-      I18n.locale = :en
-      I18n.default_locale = :en
-    end
+  # Settings
+  MIN_SUPPORTED_RUBY = '1.9.3'
 
-    def self.print_logo
-      $stdout.puts <<-PRINT
-                  __      _
-      _______ ___/ /_ _  (_)__  ___
-     / __/ -_) _  /  ' \\/ / _ \\/ -_)
-    /_/  \\__/\\_,_/_/_/_/_/_//_/\\__/
+  def self.logger
+    @logger ||= RedmineInstaller::Logger.new
+  end
+
+  def self.pastel
+    @pastel ||= Pastel.new
+  end
+
+  def self.print_logo
+    puts <<-PRINT
+                __      _
+    _______ ___/ /_ _  (_)__  ___
+   / __/ -_) _  /  ' \\/ / _ \\/ -_)
+  /_/  \\__/\\_,_/_/_/_/_/_//_/\\__/
 
 
-    #{I18n.translate(:powered_by)}
-
-      PRINT
-    end
-
+  Powered by EasyRedmine
+    PRINT
   end
 end
 
+
 # Requirements
-require 'i18n'
 require 'redmine-installer/version'
-require 'redmine-installer/error'
-require 'redmine-installer/ext/string'
-require 'redmine-installer/ext/module'
-require 'redmine-installer/install'
-require 'redmine-installer/upgrade'
-require 'redmine-installer/backup'
+require 'redmine-installer/errors'
+
+# Patches
+require 'redmine-installer/patches/tty'
+require 'redmine-installer/patches/commander'
+
+
+# Log any errors before exist
+# Kernel.at_exit do
+#   logger = RedmineInstaller.logger
+#
+#   if $!.nil?
+#     logger.info 'Ends successfully'
+#   else
+#     # Is already logged
+#     unless $!.is_a?(RedmineInstaller::Error)
+#       logger.error $!.message
+#       logger.error $!.backtrace
+#     end
+#   end
+#
+#   logger.close
+# end
