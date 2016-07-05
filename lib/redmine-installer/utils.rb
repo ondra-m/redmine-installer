@@ -11,15 +11,6 @@ module RedmineInstaller
       RedmineInstaller.logger
     end
 
-    def ok(title)
-      print "#{title} ... "
-      yield
-      puts pastel.green('OK')
-    rescue => e
-      puts pastel.red('FAIL')
-      raise
-    end
-
     def prompt
       RedmineInstaller.prompt
     end
@@ -30,6 +21,15 @@ module RedmineInstaller
 
     def run_command(cmd, title=nil)
       RedmineInstaller::Command.new(cmd, title: title).run
+    end
+
+    def ok(title)
+      print "#{title} ... "
+      yield
+      puts pastel.green('OK')
+    rescue => e
+      puts pastel.red('FAIL')
+      raise
     end
 
     def env_user
@@ -49,7 +49,6 @@ module RedmineInstaller
     end
 
     def print_title(title)
-      puts
       puts
       puts pastel.white.on_black(title)
     end
