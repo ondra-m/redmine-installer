@@ -18,6 +18,7 @@ module RedmineInstaller
       program :description, 'Easy way how install/upgrade redmine or plugin.'
 
       global_option('-d', '--debug', 'Logging message to stdout'){ $DEBUG = true }
+      global_option('-s', '--silent', 'Be less version in outpur') { $SILENT_MODE = true }
       default_command :help
 
 
