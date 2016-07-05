@@ -25,6 +25,7 @@ module RedmineInstaller
   autoload :Database, 'redmine-installer/database'
   autoload :Configuration, 'redmine-installer/configuration'
   autoload :Upgrade, 'redmine-installer/upgrade'
+  autoload :Command, 'redmine-installer/command'
 
   # Settings
   MIN_SUPPORTED_RUBY = '1.9.3'
