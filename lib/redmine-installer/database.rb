@@ -9,8 +9,6 @@ module RedmineInstaller
         menu.choice 'PostgreSQL', PostgreSQL
       end
 
-      puts
-
       # Get parameters and create configuration
       database = klass.new(redmine)
       database.get_parameters
@@ -33,7 +31,7 @@ module RedmineInstaller
       case definition['adapter']
       when 'mysql', 'mysql2'
         klass = MySQL
-      when 'pg'
+      when 'pg', 'postgresql'
         klass = PostgreSQL
       else
         error "Unknow database adapter #{definition['adapter']}."
@@ -47,9 +45,7 @@ module RedmineInstaller
     class Base
       include RedmineInstaller::Utils
 
-      # DATABASE_YML_PATH = File.join('config', 'database.yml')
-
-      # attr_reader :database, :host, :username, :password, :encoding, :port
+      attr_reader :backup
 
       def initialize(redmine)
         @redmine = redmine
@@ -91,10 +87,9 @@ module RedmineInstaller
       end
 
       def make_backup(dir)
-        ok('Database backuping'){
-          @backup = File.join(dir, "#{@database}.sql")
-          Kernel.system backup_command(@backup)
-        }
+        puts 'Database backuping'
+        @backup = File.join(dir, "#{@database}.sql")
+        Kernel.system backup_command(@backup)
       end
 
       def restore_from_backup

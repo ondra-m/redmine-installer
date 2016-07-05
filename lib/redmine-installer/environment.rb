@@ -9,6 +9,8 @@ module RedmineInstaller
       if Gem::Version.new(RUBY_VERSION) < Gem::Version.new(RedmineInstaller::MIN_SUPPORTED_RUBY)
         error "You are using unsupported ruby. Please install at least #{RedmineInstaller::MIN_SUPPORTED_RUBY}."
       end
+
+      logger.info 'Environemnt checked'
     end
 
     def user_is_root?
