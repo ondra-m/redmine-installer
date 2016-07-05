@@ -146,20 +146,20 @@ module RedmineInstaller
         "mysqldump --add-drop-database --compact --result-file=#{file} #{command_args} #{@database}"
       end
 
-      def restore_command(file)
-        "mysql #{command_args} #{@database} < #{file}"
-      end
+      # def restore_command(file)
+      #   "mysql #{command_args} #{@database} < #{file}"
+      # end
 
-      def drop_tables_command
-        execute = "SELECT CONCAT('DROP TABLE IF EXISTS ', table_name, ';') " +
-                  "FROM information_schema.tables " +
-                  "WHERE table_schema = '#{@database}';"
+      # def drop_tables_command
+      #   execute = "SELECT CONCAT('DROP TABLE IF EXISTS ', table_name, ';') " +
+      #             "FROM information_schema.tables " +
+      #             "WHERE table_schema = '#{@database}';"
 
-        drops = `mysql #{command_args} #{@database} --execute=\"#{execute}\" --silent`
-        drops = drops.gsub("\n", '')
+      #   drops = `mysql #{command_args} #{@database} --execute=\"#{execute}\" --silent`
+      #   drops = drops.gsub("\n", '')
 
-        "mysql #{command_args} #{@database} --execute=\"#{drops}\""
-      end
+      #   "mysql #{command_args} #{@database} --execute=\"#{drops}\""
+      # end
 
     end
 
@@ -171,6 +171,24 @@ module RedmineInstaller
 
       def adapter_name
         'postgresql'
+      end
+
+      def command_args
+        args = []
+        args << "--host=#{@host}"         unless @host.to_s.empty?
+        args << "--port=#{@port}"         unless @port.to_s.empty?
+        args << "--username=#{@username}" unless @username.to_s.empty?
+        args.join(' ')
+      end
+
+      def backup_command(file)
+        if @password.empty?
+          pass = ''
+        else
+          pass = "PGPASSWORD=\"#{@password}\""
+        end
+
+        "#{pass} pg_dump --clean #{command_args} #{@database} --file=#{file}"
       end
 
     end
