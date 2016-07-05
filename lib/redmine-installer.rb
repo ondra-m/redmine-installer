@@ -18,7 +18,7 @@ module RedmineInstaller
   autoload :Install, 'redmine-installer/install'
   autoload :Utils, 'redmine-installer/utils'
   autoload :Logger, 'redmine-installer/logger'
-  autoload :Modules, 'redmine-installer/modules'
+  autoload :TaskModule, 'redmine-installer/task_module'
   autoload :Environment, 'redmine-installer/environment'
   autoload :Redmine, 'redmine-installer/redmine'
   autoload :Package, 'redmine-installer/package'

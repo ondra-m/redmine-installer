@@ -5,7 +5,7 @@ require 'zip'
 require 'uri'
 
 module RedmineInstaller
-  class Package < Modules
+  class Package < TaskModule
 
     SUPPORTED_ARCHIVE_FORMATS = ['.zip', '.gz', '.tgz']
 

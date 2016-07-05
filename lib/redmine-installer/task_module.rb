@@ -1,5 +1,5 @@
 module RedmineInstaller
-  class Modules
+  class TaskModule
     include Utils
 
     attr_reader :task

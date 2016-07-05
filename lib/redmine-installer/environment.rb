@@ -1,5 +1,5 @@
 module RedmineInstaller
-  class Environment < Modules
+  class Environment < TaskModule
 
     def check
       if user_is_root? && !task.options.enable_user_root

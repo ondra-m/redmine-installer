@@ -2,7 +2,7 @@ require 'find'
 require 'open3'
 
 module RedmineInstaller
-  class Redmine < Modules
+  class Redmine < TaskModule
 
     attr_reader :database
     attr_accessor :root
