@@ -3,7 +3,7 @@ require 'find'
 module RedmineInstaller
   class Redmine < TaskModule
 
-    attr_reader :database
+    # attr_reader :database
     attr_accessor :root
 
     REQUIRED_FILES = [
@@ -19,7 +19,8 @@ module RedmineInstaller
       File.join('lib', 'redmine.rb'),
     ]
 
-    # BACKUP_EXCLUDE_FILES = ['log', 'tmp']
+    DEFAULT_BACKUP_ROOT = File.join(Dir.home, 'redmine-backups')
+    BACKUP_EXCLUDE_FILES = ['log/', 'tmp/']
 
     CHECK_N_INACCESSIBLE_FILES = 10
 
@@ -149,6 +150,11 @@ module RedmineInstaller
       end
     end
 
+    # # => ['.', '..']
+    # def empty_root?
+    #   Dir.entries(root).size <= 2
+    # end
+
     def delete_root
       Dir.chdir(root) do
         Dir.entries('.').each do |entry|
@@ -204,6 +210,7 @@ module RedmineInstaller
 
           to = File.join(plugins_path, plugin)
 
+          # Plugins does not exist
           unless Dir.exist?(to)
             FileUtils.cp_r(plugin, to)
           end
@@ -230,14 +237,13 @@ module RedmineInstaller
     end
 
     # Backup:
-    # - complete redmine (except log, tmp)
+    # - full redmine (except log, tmp)
     # - production database
     def make_backup
       print_title('Data backup')
 
       selected = prompt.select('What type of backup do you want?',
-        'Complete (entire redmine, files and database)' => :complete,
-        'Standart (configurations, files and database)' => :standart,
+        'Full (redmine root and database)' => :full,
         'Only database' => :database,
         'Nothing' => :nothing)
 
@@ -253,7 +259,7 @@ module RedmineInstaller
         end
       end
 
-      backup_root = prompt.ask('Path to backup root:', required: true)
+      backup_root = prompt.ask('Where to save backup:', required: true, default: DEFAULT_BACKUP_ROOT)
       backup_root = File.expand_path(backup_root)
 
       @backup_dir = File.join(backup_root, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
@@ -262,23 +268,23 @@ module RedmineInstaller
       files_to_backup = []
       Dir.chdir(root) do
         case selected
-        when :complete
+        when :full
           files_to_backup = Dir.glob(File.join('**', '{*,.*}'))
-        when :standart
-          files_to_backup = Dir.glob(File.join('files', '**', '{*,.*}'))
-          files_to_backup << File.join('config', 'database.yml')
-          files_to_backup << File.join('config', 'configuration.yml')
         end
       end
 
       if files_to_backup.any?
+        files_to_backup.delete_if do |path|
+          path.start_with?(*BACKUP_EXCLUDE_FILES)
+        end
+
         @backup_package = File.join(@backup_dir, 'redmine.zip')
 
         Dir.chdir(root) do
           puts
-          puts 'Files backup'
+          puts 'Files backuping'
           Zip::File.open(@backup_package, Zip::File::CREATE) do |zipfile|
-            progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: files_to_backup.size, frequency: 2)
+            progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: files_to_backup.size, frequency: 2, clear: true)
 
             files_to_backup.each do |entry|
               zipfile.add(entry, entry)
@@ -289,12 +295,14 @@ module RedmineInstaller
           end
         end
 
+        puts "Files backed up on #{@backup_package}"
         logger.info('Files backed up')
       end
 
       @database = Database.init(self)
       @database.make_backup(@backup_dir)
 
+      puts "Database backed up on #{@database.backup}"
       logger.info('Database backed up')
     end
 
