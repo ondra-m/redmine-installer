@@ -1,5 +1,4 @@
 require 'find'
-require 'open3'
 
 module RedmineInstaller
   class Redmine < TaskModule
@@ -304,31 +303,8 @@ module RedmineInstaller
 
     private
 
-      def run_command(title, cmd)
-        puts '-->'
-        puts "--> #{pastel.yellow(title)}"
-        puts '-->'
-
-        logger.std("--> #{title} (#{cmd})")
-
-        status = Open3.popen2e(cmd) do |input, output, wait_thr|
-          input.close
-
-          output.each_line do |line|
-            logger.std(line)
-            puts line
-          end
-
-          wait_thr.value
-        end
-
-        status.success?
-      rescue
-        false
-      end
-
       def bundle_install
-        status = run_command('Bundle install', "bundle install #{task.options.bundle_options}")
+        status = run_command("bundle install #{task.options.bundle_options}", 'Bundle install')
 
         # Even if bundle could not install all gem EXIT_SUCCESS is returned
         if !status || !File.exist?('Gemfile.lock')
@@ -352,11 +328,11 @@ module RedmineInstaller
 
       def rake_db_create
         # Always return 0
-        run_command('Database preparation', 'RAILS_ENV=production bundle exec rake db:create')
+        run_command('RAILS_ENV=production bundle exec rake db:create', 'Database creating')
       end
 
       def rake_db_migrate
-        status = run_command('Database migration', 'RAILS_ENV=production bundle exec rake db:migrate')
+        status = run_command('RAILS_ENV=production bundle exec rake db:migrate', 'Database migrating')
 
         unless status
           puts
@@ -378,7 +354,7 @@ module RedmineInstaller
       end
 
       def rake_redmine_plugin_migrate
-        status = run_command('Plugins migration', 'RAILS_ENV=production bundle exec rake redmine:plugins:migrate')
+        status = run_command('RAILS_ENV=production bundle exec rake redmine:plugins:migrate', 'Plugins migration')
 
         unless status
           puts
@@ -399,7 +375,7 @@ module RedmineInstaller
       end
 
       def rake_generate_secret_token
-        status = run_command('Generate secret token', 'RAILS_ENV=production bundle exec rake generate_secret_token')
+        status = run_command('RAILS_ENV=production bundle exec rake generate_secret_token', 'Generating secret token')
 
         unless status
           puts
@@ -420,7 +396,7 @@ module RedmineInstaller
       end
 
       def rake_easyproject_install
-        status = run_command('Install easyproject', 'RAILS_ENV=production bundle exec rake easyproject:install')
+        status = run_command('RAILS_ENV=production bundle exec rake easyproject:install', 'Installing easyproject')
 
         unless status
           puts
