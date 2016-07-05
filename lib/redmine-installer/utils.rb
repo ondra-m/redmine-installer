@@ -21,11 +21,15 @@ module RedmineInstaller
     end
 
     def prompt
-      @prompt ||= TTY::Prompt.new
+      RedmineInstaller.prompt
     end
 
     def pastel
       RedmineInstaller.pastel
+    end
+
+    def run_command(cmd, title=nil)
+      RedmineInstaller::Command.new(cmd, title: title).run
     end
 
     def env_user

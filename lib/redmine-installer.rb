@@ -6,6 +6,7 @@ require 'pastel'
 require 'yaml'
 
 require 'tty-progressbar'
+require 'tty-spinner'
 require 'tty-prompt'
 
 require 'pry'
@@ -27,10 +28,14 @@ module RedmineInstaller
   autoload :Command, 'redmine-installer/command'
 
   # Settings
-  MIN_SUPPORTED_RUBY = '1.9.3'
+  MIN_SUPPORTED_RUBY = '2.0.0'
 
   def self.logger
     @logger ||= RedmineInstaller::Logger.new
+  end
+
+  def self.prompt
+    @prompt ||= TTY::Prompt.new
   end
 
   def self.pastel
