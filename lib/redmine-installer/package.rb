@@ -96,14 +96,14 @@ module RedmineInstaller
           end
 
           print_title("Downloading redmine #{version}")
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2)
+          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2, clear: true)
 
           http.get(uri) do |data|
             @temp_file.write(data)
             progressbar.advance(data.size)
           end
 
-          # progressbar.finish
+          progressbar.finish
         end
 
         logger.info("Redmine #{version} downloaded")
@@ -115,7 +115,7 @@ module RedmineInstaller
       def extract_zip
         Zip::File.open(@package) do |zip_file|
           # Progressbar
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: zip_file.size, frequency: 2)
+          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: zip_file.size, frequency: 2, clear: true)
 
           zip_file.each do |entry|
             dest_file = File.join(@temp_dir, entry.name)
@@ -125,7 +125,7 @@ module RedmineInstaller
             progressbar.advance(1)
           end
 
-          # progressbar.finish
+          progressbar.finish
         end
 
       end
@@ -143,7 +143,7 @@ module RedmineInstaller
         Gem::Package::TarReader.new(Zlib::GzipReader.open(@package)) do |tar|
 
           # Progressbar
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: tar.count, frequency: 2)
+          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: tar.count, frequency: 2, clear: true)
 
           # tar.count move position pointer to end
           tar.rewind
@@ -172,7 +172,7 @@ module RedmineInstaller
             progressbar.advance(1)
           end
 
-          # progressbar.finish
+          progressbar.finish
         end
       end
 
