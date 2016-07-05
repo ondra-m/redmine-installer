@@ -7,7 +7,6 @@ require 'yaml'
 
 require 'tty-progressbar'
 require 'tty-prompt'
-require 'commander'
 
 require 'pry'
 
@@ -58,7 +57,6 @@ require 'redmine-installer/errors'
 
 # Patches
 require 'redmine-installer/patches/tty'
-require 'redmine-installer/patches/commander'
 
 
 # Log any errors before exist
