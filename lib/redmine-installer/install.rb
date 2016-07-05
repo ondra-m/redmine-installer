@@ -13,10 +13,19 @@ module RedmineInstaller
       @temp_redmine.create_configuration_yml
       @temp_redmine.install
 
-      @target_redmine.delete_root
+      print_title('Finishing installation')
 
-      @target_redmine.move_from(@temp_redmine)
-      @package.clean_up
+      ok('Cleaning root'){
+        @target_redmine.delete_root
+      }
+
+      ok('Moving redmine to target directory'){
+        @target_redmine.move_from(@temp_redmine)
+      }
+
+      ok('Cleanning up'){
+        @package.clean_up
+      }
 
       puts
       puts pastel.bold('Redmine was installed')

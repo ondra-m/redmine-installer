@@ -3,9 +3,9 @@ module RedmineInstaller
 
     def up
       @environment.check
-      @target_redmine.ensure_valid_root
+      @target_redmine.ensure_and_valid_root
       @target_redmine.validate
-      @package.ensure_valid_package
+      @package.ensure_and_valid_package
       @package.extract
 
       @temp_redmine.root = @package.redmine_root
@@ -19,23 +19,29 @@ module RedmineInstaller
         @temp_redmine.upgrade
       rescue => e
         if @target_redmine.database && @target_redmine.database.backuped?
-          if prompt.yes?("Upgrade failed. Do you want restore database backup?", default: true)
-            @target_redmine.database.restore_from_backup
-            puts 'Database restored'
-            logger.info('Database restored')
-          else
-            logger.warn('Upgrade failed but restore was rejected')
-          end
+          addition_message = "Database have been backed up on #{pastel.bold(@target_redmine.database.backup)}."
+        else
+          addition_message = ''
         end
 
-        error('Upgrade failed')
+        error("Upgrade failed due to #{e.message}. #{addition_message}")
       end
 
-      @target_redmine.delete_root
-      @target_redmine.copy_root(@temp_redmine)
+      print_title('Finishing installation')
 
-      @package.clean_up
+      ok('Cleaning root'){
+        @target_redmine.delete_root
+      }
 
+      ok('Moving redmine to target directory'){
+        @target_redmine.move_from(@temp_redmine)
+      }
+
+      ok('Cleanning up'){
+        @package.clean_up
+      }
+
+      puts
       puts pastel.bold('Redmine was upgraded')
       logger.info('Redmine was upgraded')
     end
