@@ -2,7 +2,7 @@ module RedmineInstaller
   class Database
     extend Utils
 
-    def self.create(redmine)
+    def self.create_config(redmine)
       # Maybe: enum_select
       klass = prompt.select('What database do you want use?') do |menu|
         menu.choice 'MySQL', MySQL

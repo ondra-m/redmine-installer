@@ -16,7 +16,7 @@ module RedmineInstaller
       @package = package.to_s
     end
 
-    def ensure_valid_package
+    def ensure_and_valid_package
       if package.empty?
         @package = prompt.ask('Path to package:', required: true)
       end
@@ -51,7 +51,7 @@ module RedmineInstaller
     end
 
     # Move files from temp dir to target. First check if folder contains redmine
-    # or contains folder which contains redmine
+    # or contains folder which contains redmine.
     #
     # Package can have format:
     # |-- redmine-2

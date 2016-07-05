@@ -3,8 +3,8 @@ module RedmineInstaller
 
     def up
       @environment.check
-      @target_redmine.ensure_valid_root
-      @package.ensure_valid_package
+      @target_redmine.ensure_and_valid_root
+      @package.ensure_and_valid_package
       @package.extract
 
       @temp_redmine.root = @package.redmine_root
@@ -14,8 +14,8 @@ module RedmineInstaller
       @temp_redmine.install
 
       @target_redmine.delete_root
-      @target_redmine.copy_root(@temp_redmine)
 
+      @target_redmine.move_from(@temp_redmine)
       @package.clean_up
 
       puts

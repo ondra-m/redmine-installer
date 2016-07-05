@@ -7,7 +7,7 @@ module RedmineInstaller
   class Configuration
     extend Utils
 
-    def self.create(redmine)
+    def self.create_config(redmine)
       # Maybe: enum_select
       klass = prompt.select('Which service to use for email sending?') do |menu|
         menu.default 4

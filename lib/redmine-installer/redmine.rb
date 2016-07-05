@@ -47,7 +47,7 @@ module RedmineInstaller
 
     # Ask for REDMINE_ROOT (if wasnt set) and check access rights
     #
-    def ensure_valid_root
+    def ensure_and_valid_root
       if root.empty?
         puts
         @root = prompt.ask('Path to redmine root:', required: true, default: '.')
@@ -83,7 +83,7 @@ module RedmineInstaller
     def create_database_yml
       print_title('Creating database configuration')
 
-      @database = Database.create(self)
+      @database = Database.create_config(self)
       logger.info("Database initialized #{@database}")
     end
 
@@ -93,7 +93,7 @@ module RedmineInstaller
     def create_configuration_yml
       print_title('Creating email configuration')
 
-      @configuration = Configuration.create(self)
+      @configuration = Configuration.create_config(self)
       logger.info("Configuration initialized #{@configuration}")
     end
 
@@ -161,7 +161,7 @@ module RedmineInstaller
       logger.info("#{root} content was deleted")
     end
 
-    def copy_root(other_redmine)
+    def move_from(other_redmine)
       Dir.chdir(other_redmine.root) do
         Dir.entries('.').each do |entry|
           next if entry == '.' || entry == '..'
