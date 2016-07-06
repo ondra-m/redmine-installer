@@ -51,6 +51,7 @@ module RedmineInstaller
 
 
   Powered by EasyRedmine
+
     PRINT
   end
 end

@@ -67,6 +67,20 @@ module RedmineInstaller
       end
       alias_command :u, :upgrade
 
+
+       # --- Verify log -------------------------------------------------------
+       command :'verify-log' do |c|
+         c.syntax = 'verify-log LOGFILE'
+         c.description = 'Verify redmine installer log file'
+
+         c.example 'Verify log',
+                   'redmine verify-log LOGFILE'
+
+         c.action do |args, _|
+           RedmineInstaller::Logger.verify(args[0])
+         end
+       end
+
       run!
     end
 

@@ -3,6 +3,25 @@ require 'digest'
 module RedmineInstaller
   class Logger
 
+    def self.verify(log_file)
+      log_file = log_file.to_s
+
+      unless File.exist?(log_file)
+        puts "File '#{log_file}' does not exist."
+        exit(false)
+      end
+
+      content = File.open(log_file, &:to_a)
+      digest1 = content.pop
+      digest2 = Digest::SHA256.hexdigest(content.join)
+
+      if digest1 == digest2
+        puts RedmineInstaller.pastel.green("Logfile is OK. Digest verified.")
+      else
+        puts RedmineInstaller.pastel.red("Logfile is not OK. Digest wasn't verified.")
+      end
+    end
+
     def initialize
       @output = nil
       Dir::Tmpname.create('redmine_installer.log') do |tmpname, n, opts|
