@@ -4,9 +4,16 @@ module RedmineInstaller
   class Logger
 
     def initialize
-      # @output = Tempfile.new('redmine_installer.log')
+      @output = nil
+      Dir::Tmpname.create('redmine_installer.log') do |tmpname, n, opts|
+        mode = File::RDWR | File::CREAT | File::EXCL
+        opts[:perm] = 0600
+        @output = File.open(tmpname, mode, opts)
+      end
+
       # @output = $stdout
-      @output = File.open('log.out', 'w+')
+    end
+
     def path
       @output.path
     end
@@ -20,6 +27,16 @@ module RedmineInstaller
     def close
       @output.flush
       @output.close
+    end
+
+    def move_to(redmine)
+      close
+
+      new_path = File.join(redmine.log_path, Time.now.strftime('redmine_installer_%d%m%Y_%H%M%S.log'))
+
+      FileUtils.mkdir_p(redmine.log_path)
+      FileUtils.mv(path, new_path)
+      @output = File.open(new_path, 'a+')
     end
 
     def info(*messages)

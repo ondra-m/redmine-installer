@@ -45,6 +45,10 @@ module RedmineInstaller
       File.join(root, 'plugins')
     end
 
+    def log_path
+      File.join(root, 'log')
+    end
+
     def pids_files
       Dir.glob(File.join(root, 'tmp', 'pids', '*'))
     end
