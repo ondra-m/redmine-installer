@@ -12,7 +12,7 @@ module RedmineInstaller
 
       @target_redmine.make_backup
 
-      @temp_redmine.copy_instance_files_from(@target_redmine)
+      @temp_redmine.copy_importants_from(@target_redmine)
       @temp_redmine.copy_missing_plugins_from(@target_redmine)
 
       begin
@@ -28,18 +28,9 @@ module RedmineInstaller
       end
 
       print_title('Finishing installation')
-
-      ok('Cleaning root'){
-        @target_redmine.delete_root
-      }
-
-      ok('Moving redmine to target directory'){
-        @target_redmine.move_from(@temp_redmine)
-      }
-
-      ok('Cleanning up'){
-        @package.clean_up
-      }
+      ok('Cleaning root'){ @target_redmine.delete_root }
+      ok('Moving redmine to target directory'){ @target_redmine.move_from(@temp_redmine) }
+      ok('Cleanning up'){ @package.clean_up }
 
       puts
       puts pastel.bold('Redmine was upgraded')

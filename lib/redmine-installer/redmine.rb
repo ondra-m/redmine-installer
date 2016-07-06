@@ -45,6 +45,14 @@ module RedmineInstaller
       File.join(root, 'plugins')
     end
 
+    def pids_files
+      Dir.glob(File.join(root, 'tmp', 'pids', '*'))
+    end
+
+    def running?
+      pids_files.any?
+    end
+
     # Ask for REDMINE_ROOT (if wasnt set) and check access rights
     #
     def ensure_and_valid_root
@@ -177,9 +185,9 @@ module RedmineInstaller
       logger.info("Copyied from #{other_redmine.root} into #{root}")
     end
 
-    # Copy instance files which cannot be deleted
+    # Copy important files which cannot be deleted
     #
-    def copy_instance_files_from(other_redmine)
+    def copy_importants_from(other_redmine)
       Dir.chdir(root) do
         # Copy database.yml
         FileUtils.cp(other_redmine.database_yml_path, database_yml_path)
