@@ -67,7 +67,7 @@ Kernel.at_exit do
   RedmineInstaller.logger.finish
 end
 
-# Log any errors before exist
+# Log any errors before exit
 # Kernel.at_exit do
 #   logger = RedmineInstaller.logger
 #
@@ -82,4 +82,15 @@ end
 #   end
 #
 #   logger.close
+# end
+
+# Signal.trap('SIGINT') do
+#   if $REDMINE_INT
+#     exit 1
+#   else
+#     puts
+#     puts RedmineInstaller.pastel.bold('You sent terminate signal. Press again to cancel installer.')
+#     puts
+#     $REDMINE_INT = true
+#   end
 # end

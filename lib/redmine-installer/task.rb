@@ -31,6 +31,7 @@ module RedmineInstaller
     end
 
     def up
+      raise NotImplementedError
     end
 
     def down

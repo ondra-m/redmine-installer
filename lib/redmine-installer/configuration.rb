@@ -18,8 +18,6 @@ module RedmineInstaller
         menu.choice 'Nothing', Nothing
       end
 
-      puts
-
       # Get parameters and create configuration
       database = klass.new(redmine)
       database.get_parameters
@@ -29,8 +27,6 @@ module RedmineInstaller
 
     class Base
       include RedmineInstaller::Utils
-
-      # CONFIGURATION_YML_PATH = File.join('config', 'configuration.yml')
 
       def initialize(redmine)
         @redmine = redmine

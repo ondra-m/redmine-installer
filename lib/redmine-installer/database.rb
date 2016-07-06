@@ -92,14 +92,14 @@ module RedmineInstaller
         Kernel.system backup_command(@backup)
       end
 
-      def restore_from_backup
-        return unless backuped?
+    #   def restore_from_backup
+    #     return unless backuped?
 
-        ok('Database restoring'){
-          Kernel.system drop_tables_command
-          Kernel.system restore_command(@backup)
-        }
-      end
+    #     ok('Database restoring'){
+    #       Kernel.system drop_tables_command
+    #       Kernel.system restore_command(@backup)
+    #     }
+    #   end
 
       def build
         data = {}
