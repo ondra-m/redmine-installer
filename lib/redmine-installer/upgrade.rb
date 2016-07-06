@@ -5,6 +5,16 @@ module RedmineInstaller
       @environment.check
       @target_redmine.ensure_and_valid_root
       @target_redmine.validate
+
+      if @target_redmine.running?
+        puts
+        if prompt.yes?("Your app is running based on PID files (#{@target_redmine.pids_files.join(', ')}). Do you want continue?", default: false)
+          logger.warn("App is running (pids: #{@target_redmine.pids_files.join(', ')}). Ignore it and continue.")
+        else
+          error('App is running')
+        end
+      end
+
       @package.ensure_and_valid_package
       @package.extract
 
