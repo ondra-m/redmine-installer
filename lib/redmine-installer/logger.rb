@@ -1,3 +1,5 @@
+require 'digest'
+
 module RedmineInstaller
   class Logger
 
@@ -5,6 +7,14 @@ module RedmineInstaller
       # @output = Tempfile.new('redmine_installer.log')
       # @output = $stdout
       @output = File.open('log.out', 'w+')
+    def path
+      @output.path
+    end
+
+    def finish
+      close
+      digest = Digest::SHA256.file(path).hexdigest
+      File.open(path, 'a') { |f| f.write(digest) }
     end
 
     def close
