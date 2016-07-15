@@ -86,7 +86,7 @@ module RedmineInstaller
       end
 
       if inaccessible_files.any?
-        error "Redmine root contains inaccessible files. Make sure that all files in #{@root} are readable/writeable for user #{env_user}.", "(limit #{CHECK_N_INACCESSIBLE_FILES} files: #{inaccessible_files.join(', ')})"
+        error "Redmine root contains inaccessible files. Make sure that all files in #{@root} are readable/writeable for user #{env_user} (limit #{CHECK_N_INACCESSIBLE_FILES} files: #{inaccessible_files.join(', ')})"
       end
     end
 
