@@ -64,6 +64,9 @@ require 'redmine-installer/errors'
 # Patches
 require 'redmine-installer/patches/tty'
 
+if ENV['REDMINE_INSTALLER_SPEC']
+end
+
 Kernel.at_exit do
   RedmineInstaller.logger.finish
 end

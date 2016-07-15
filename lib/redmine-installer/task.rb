@@ -4,7 +4,7 @@ module RedmineInstaller
 
     attr_reader :options
 
-    def initialize(package, redmine_root, options)
+    def initialize(package, redmine_root, **options)
       @options = OpenStruct.new(options)
 
       @environment = Environment.new(self)
