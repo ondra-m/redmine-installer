@@ -1,30 +1,23 @@
-# require 'simplecov'
-# SimpleCov.start
+lib = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(lib) if !$LOAD_PATH.include?(lib)
 
-require 'tmpdir'
-require 'tempfile'
-require 'fileutils'
-
-$LOAD_PATH.unshift File.dirname(__FILE__) + '/../lib'
 require 'redmine-installer'
-require 'load_redmine'
+require 'childprocess'
 
-I18n.locale = :en
+module STDHelper
+
+  def _input
+    RedmineInstaller.prompt.input
+  end
+
+  def _output
+    RedmineInstaller.prompt.output
+  end
+
+end
+
 
 RSpec.configure do |config|
-  config.default_formatter = 'doc'
-  config.color = true
-  config.tty   = true
-
-  config.add_setting :mysql
-  config.mysql = {
-    host: 'localhost',
-    port: '3306',
-    username: 'root',
-    password: 'root'
-  }
-
-  config.after(:suite) do
-    LoadRedmine.clean
-  end
+  config.disable_monkey_patching!
+  config.include STDHelper
 end

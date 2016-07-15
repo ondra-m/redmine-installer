@@ -1,46 +1,192 @@
 require 'spec_helper'
 
-RSpec.describe Redmine::Installer::Install do
+RSpec.describe RedmineInstaller::Install do
 
-  before(:example) do
-    @dir = Dir.mktmpdir
+  around(:each) do |example,a,b|
+    # tempfile = Tempfile.new('redmine-installer-output')
+
+    stdout_file = File.open('redmine-installer-out', 'w+')
+    stdout_file.sync = true
+
+    stderr_file = File.open('redmine-installer-err', 'w+')
+    stderr_file.sync = true
+
+    args = Array(example.metadata[:args])
+
+    @installer_process = ChildProcess.build('bin/redmine', 'install', *args)
+    @installer_process.io.stdout = stdout_file
+    @installer_process.io.stderr = stderr_file
+    @installer_process.environment['REDMINE_INSTALLER_SPEC'] = '1'
+    @installer_process.duplex = true
+    @installer_process.detach = true
+    @installer_process.start
+
+    example.run
+
+    stdout_file.close
+    stderr_file.close
+    @installer_process.stop
   end
 
-  after(:example) do
-    FileUtils.remove_entry_secure(@dir)
+  def stdin
+    @installer_process.io.stdin
   end
 
-  let(:package1) { LoadRedmine.get('2.4.7') }
+  def stdout
+    @installer_process.io.stdout
+  end
 
-  context 'mysql' do
-    let(:host)     { RSpec.configuration.mysql[:host] }
-    let(:port)     { RSpec.configuration.mysql[:port] }
-    let(:username) { RSpec.configuration.mysql[:username] }
-    let(:password) { RSpec.configuration.mysql[:password] }
+  def stderr
+    @installer_process.io.stderr
+  end
 
-    before(:example) do
-      system("mysql -h #{host} --port #{port} -u #{username} -p#{password} -e 'drop database test1'")
+  def read_new
+    sleep 1
+
+    @seek ||= 0
+    buffer = ''
+
+    stdout.pos = @seek
+    loop {
+      out = stdout.read
+      if out.empty?
+        # On end
+        break
+      else
+        # There is still change that samoe output come
+        buffer << out
+        sleep 0.5
+      end
+    }
+    @seek = stdout.pos
+    buffer
+  end
+
+  # TODO: Timeout
+  def read_new_or_wait
+    while (out = read_new).empty?
+      sleep 0.1
     end
-
-    it 'install' do
-      # redmine root -> temp dir
-      # type of db -> mysql
-      # database -> test1
-      # host -> configuration
-      # username -> configuration
-      # password -> configuration
-      # encoding -> utf8
-      # port -> configuration
-      # email configuration -> skip
-      # webserver -> skip
-
-      allow($stdin).to receive(:gets).and_return(
-        @dir, '1', 'test1', host, username, password, 'utf8', port, '999', '999'
-      )
-
-      r_installer = Redmine::Installer::Install.new(package1, {})
-      expect { r_installer.run }.to_not raise_error
-    end
+    out
   end
+
+  def write(text)
+    stdin << (text + "\n")
+  end
+
+  def read_new_and_wait_for(text)
+    buffer = ''
+    loop {
+      buffer << read_new
+      if buffer.include?(text)
+        break
+      else
+        sleep 0.5
+      end
+    }
+    buffer
+  end
+
+  it 'bad permission', args: [] do
+    redmine_root = Dir.mktmpdir('redmine_root')
+
+    system("chmod 000 #{redmine_root}")
+
+    expect(read_new_or_wait).to include('Path to redmine root:')
+    write(redmine_root)
+
+    expect(read_new_or_wait).to include('Redmine root contains inaccessible files')
+  end
+
+  it 'non-exstinig package' do
+    redmine_root = Dir.mktmpdir('redmine_root')
+
+    expect(read_new_or_wait).to include('Path to redmine root:')
+    write(redmine_root)
+
+    expect(read_new_or_wait).to include('Path to package:')
+    write('aaa')
+
+    expect(read_new_or_wait).to include("File aaa must have format: .zip, .gz, .tgz")
+    expect(read_new_or_wait).to include("File doesn't exist")
+  end
+
+  it 'non-exstinig package' do
+    redmine_root = Dir.mktmpdir('redmine_root')
+
+    expect(read_new_or_wait).to include('Path to redmine root:')
+    write(redmine_root)
+
+    expect(read_new_or_wait).to include('Path to package:')
+    write('aaa.zip')
+
+    expect(read_new_or_wait).to include("File doesn't exist")
+  end
+
+  it 'install without arguments', args: [] do
+    redmine_root = Dir.mktmpdir('redmine_root')
+    regular_package = File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'redmine-3.1.0.zip'))
+
+    expect(read_new_or_wait).to include('Path to redmine root:')
+    write(redmine_root)
+
+    expect(read_new_or_wait).to include('Path to package:')
+    write(regular_package)
+
+    out = read_new_or_wait
+    expect(out).to include('Extracting redmine package')
+    expect(out).to include('Creating database configuration')
+    expect(out).to include('What database do you want use?')
+    expect(out).to include('‣ MySQL')
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expect(read_new_or_wait).to include('‣ PostgreSQL')
+    write(' ')
+
+    expect(read_new_or_wait).to include('Database:')
+    write('test')
+
+    expect(read_new_or_wait).to include('Host: (localhost)')
+    write('')
+
+    expect(read_new_or_wait).to include('Username:')
+    write('postgres')
+
+    expect(read_new_or_wait).to include('Password:')
+    write('postgres')
+
+    expect(read_new_or_wait).to include('Encoding: (utf8)')
+    write('')
+
+    expect(read_new_or_wait).to include('Port: (5432)')
+    write('')
+
+    out = read_new_or_wait
+    expect(out).to include('Creating email configuration')
+    expect(out).to include('Which service to use for email sending?')
+    expect(out).to include('‣ Nothing')
+    write(' ')
+
+    out = read_new_and_wait_for('Redmine was installed')
+    expect(out).to include('Redmine installing')
+    expect(out).to include('--> Bundle install')
+    expect(out).to include('--> Database creating')
+    expect(out).to include('--> Database migrating')
+    expect(out).to include('--> Plugins migration')
+    expect(out).to include('--> Generating secret token')
+
+    expect(out).to include('Cleaning root ... OK')
+    expect(out).to include('Moving redmine to target directory ... OK')
+    expect(out).to include('Cleanning up ... OK')
+    expect(out).to include('Moving installer log ... OK')
+  end
+
+  # it 'package', args: ['/home/ondra/Downloads/redmine-3.3.0.zip'] do
+  #   binding.pry unless $__binding
+  # end
+
+  # it 'package, root', args: ['/home/ondra/Downloads/redmine-3.3.0.zip', 'test'] do
+  #   binding.pry unless $__binding
+  # end
 
 end
