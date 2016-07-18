@@ -23,14 +23,15 @@ module RedmineInstaller
     end
 
     def initialize
-      @output = nil
-      Dir::Tmpname.create('redmine_installer.log') do |tmpname, n, opts|
-        mode = File::RDWR | File::CREAT | File::EXCL
-        opts[:perm] = 0600
-        @output = File.open(tmpname, mode, opts)
+      if ENV['REDMINE_INSTALLER_LOGFILE']
+        @output = File.open(ENV['REDMINE_INSTALLER_LOGFILE'], 'w')
+      else
+        Dir::Tmpname.create('redmine_installer.log') do |tmpname, n, opts|
+          mode = File::RDWR | File::CREAT | File::EXCL
+          opts[:perm] = 0600
+          @output = File.open(tmpname, mode, opts)
+        end
       end
-
-      # @output = $stdout
     end
 
     def path
