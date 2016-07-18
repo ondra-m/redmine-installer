@@ -112,6 +112,66 @@ RSpec.describe RedmineInstaller::Install do
     end
   end
 
+  it 'download redmine', args: ['v3.1.1'] do
+    redmine_root = Dir.mktmpdir('redmine_root')
+
+    expect(@process).to have_output('Path to redmine root:')
+    write(redmine_root)
+
+    expect(@process).to have_output_in('Downloading redmine 3.1.1', 20)
+    expect(@process).to have_output('Extracting redmine package')
+    expect(@process).to have_output('Creating database configuration')
+    expect(@process).to have_output('What database do you want use?')
+    expect(@process).to have_output('‣ MySQL')
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expect(@process).to have_output('‣ PostgreSQL')
+    write(' ')
+
+    expect(@process).to have_output('Database:')
+    write('test')
+
+    expect(@process).to have_output('Host: (localhost)')
+    write('')
+
+    expect(@process).to have_output('Username:')
+    write('postgres')
+
+    expect(@process).to have_output('Password:')
+    write('postgres')
+
+    expect(@process).to have_output('Encoding: (utf8)')
+    write('')
+
+    expect(@process).to have_output('Port: (5432)')
+    write('')
+
+    expect(@process).to have_output('Creating email configuration')
+    expect(@process).to have_output('Which service to use for email sending?')
+    expect(@process).to have_output('‣ Nothing')
+    write(' ')
+
+    expect(@process).to have_output('Redmine installing')
+    expect(@process).to have_output_in('--> Bundle install', 50)
+    expect(@process).to have_output_in('--> Database creating', 50)
+    expect(@process).to have_output_in('--> Database migrating', 50)
+    expect(@process).to have_output_in('--> Plugins migration', 50)
+    expect(@process).to have_output_in('--> Generating secret token', 50)
+
+    expect(@process).to have_output('Cleaning root ... OK')
+    expect(@process).to have_output('Moving redmine to target directory ... OK')
+    expect(@process).to have_output('Cleanning up ... OK')
+    expect(@process).to have_output('Moving installer log ... OK')
+
+    expect(@process).to have_output('Redmine was installed')
+
+    Dir.chdir(redmine_root) do
+      out = `rails runner "puts Redmine::VERSION.to_s"`
+      expect($?.success?).to be_truthy
+      expect(out).to include('3.1.1')
+    end
+  end
+
   # it 'package', args: ['/home/ondra/Downloads/redmine-3.3.0.zip'] do
   #   binding.pry unless $__binding
   # end
