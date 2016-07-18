@@ -66,7 +66,6 @@ require 'redmine-installer/patches/tty'
 
 if ENV['REDMINE_INSTALLER_SPEC']
   require 'redmine-installer/spec/spec'
-  require 'redmine-installer/spec/cursor'
 end
 
 Kernel.at_exit do
