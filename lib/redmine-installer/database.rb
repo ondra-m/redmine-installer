@@ -61,12 +61,12 @@ module RedmineInstaller
         @username = prompt.ask('Username:', required: true)
         @password = prompt.mask('Password:', required: true)
         @encoding = prompt.ask('Encoding:', default: 'utf8', required: true)
-        @port = prompt.ask('Database:', default: default_port, convert: :int, required: true)
+        @port = prompt.ask('Port:', default: default_port, convert: :int, required: true)
 
         # @database = 'test'
         # @host = 'localhost'
-        # @username = 'root'
-        # @password = 'root'
+        # @username = 'postgres'
+        # @password = 'postgres'
         # @encoding = 'utf8'
         # @port = default_port
       end
