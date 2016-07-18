@@ -2,89 +2,108 @@ require 'spec_helper'
 
 RSpec.describe RedmineInstaller::Install do
 
-  around(:each) do |example,a,b|
-    # tempfile = Tempfile.new('redmine-installer-output')
+  # around(:each) do |example,a,b|
+  #   # tempfile = Tempfile.new('redmine-installer-output')
 
-    stdout_file = File.open('redmine-installer-out', 'w+')
-    stdout_file.sync = true
+  #   stdout_file = File.open('redmine-installer-out', 'w+')
+  #   stdout_file.sync = true
 
-    stderr_file = File.open('redmine-installer-err', 'w+')
-    stderr_file.sync = true
+  #   # Keep it for "Inappropriate ioctl for device"
+  #   stderr_file = File.open('redmine-installer-err', 'w+')
+  #   stderr_file.sync = true
 
-    args = Array(example.metadata[:args])
+  #   args = Array(example.metadata[:args])
 
-    @installer_process = ChildProcess.build('bin/redmine', 'install', *args)
-    @installer_process.io.stdout = stdout_file
-    @installer_process.io.stderr = stderr_file
-    @installer_process.environment['REDMINE_INSTALLER_SPEC'] = '1'
-    @installer_process.duplex = true
-    @installer_process.detach = true
-    @installer_process.start
+  #   @installer_process = ChildProcess.build('bin/redmine', 'install', *args)
+  #   @installer_process.io.stdout = stdout_file
+  #   @installer_process.io.stderr = stderr_file
+  #   @installer_process.environment['REDMINE_INSTALLER_SPEC'] = '1'
+  #   @installer_process.duplex = true
+  #   @installer_process.detach = true
+  #   @installer_process.start
 
+  #   example.run
+
+  #   stdout_file.close
+  #   stderr_file.close
+  #   @installer_process.stop
+  # end
+
+  # def stdin
+  #   @installer_process.io.stdin
+  # end
+
+  # def stdout
+  #   @installer_process.io.stdout
+  # end
+
+  # def stderr
+  #   @installer_process.io.stderr
+  # end
+
+  # def read_new
+  #   sleep 1
+
+  #   @seek ||= 0
+  #   buffer = ''
+
+  #   stdout.pos = @seek
+  #   loop {
+  #     out = stdout.read
+  #     if out.empty?
+  #       # On end
+  #       break
+  #     else
+  #       # There is still change that samoe output come
+  #       buffer << out
+  #       sleep 0.5
+  #     end
+  #   }
+  #   @seek = stdout.pos
+  #   buffer
+  # end
+
+  # # TODO: Timeout
+  # def read_new_or_wait
+  #   while (out = read_new).empty?
+  #     sleep 0.1
+  #   end
+  #   out
+  # end
+
+  # def write(text)
+  #   stdin << (text + "\n")
+  # end
+
+  # def read_new_and_wait_for(text)
+  #   buffer = ''
+  #   loop {
+  #     buffer << read_new
+  #     if buffer.include?(text)
+  #       break
+  #     else
+  #       sleep 0.5
+  #     end
+  #   }
+  #   buffer
+  # end
+
+  # def expected_output(text)
+  #   @pos ||= 0
+  #   @buffer ||= ''
+
+  #   stdout.pos = @pos
+  # end
+
+  around(:each) do |example|
+    @process = RedmineInstallerProcess.new('install', example.metadata[:args])
+    @process.start
     example.run
-
-    stdout_file.close
-    stderr_file.close
-    @installer_process.stop
-  end
-
-  def stdin
-    @installer_process.io.stdin
-  end
-
-  def stdout
-    @installer_process.io.stdout
-  end
-
-  def stderr
-    @installer_process.io.stderr
-  end
-
-  def read_new
-    sleep 1
-
-    @seek ||= 0
-    buffer = ''
-
-    stdout.pos = @seek
-    loop {
-      out = stdout.read
-      if out.empty?
-        # On end
-        break
-      else
-        # There is still change that samoe output come
-        buffer << out
-        sleep 0.5
-      end
-    }
-    @seek = stdout.pos
-    buffer
-  end
-
-  # TODO: Timeout
-  def read_new_or_wait
-    while (out = read_new).empty?
-      sleep 0.1
-    end
-    out
+    @process.stop
   end
 
   def write(text)
-    stdin << (text + "\n")
-  end
-
-  def read_new_and_wait_for(text)
-    buffer = ''
-    loop {
-      buffer << read_new
-      if buffer.include?(text)
-        break
-      else
-        sleep 0.5
-      end
-    }
-    buffer
+    @process.write(text)
   end
 
   it 'bad permission', args: [] do
@@ -92,93 +111,90 @@ RSpec.describe RedmineInstaller::Install do
 
     system("chmod 000 #{redmine_root}")
 
-    expect(read_new_or_wait).to include('Path to redmine root:')
+    expect(@process).to have_output('Path to redmine root:')
     write(redmine_root)
 
-    expect(read_new_or_wait).to include('Redmine root contains inaccessible files')
+    expect(@process).to have_output('Redmine root contains inaccessible files')
   end
 
-  it 'non-exstinig package' do
+  it 'non-existinig package' do
     redmine_root = Dir.mktmpdir('redmine_root')
 
-    expect(read_new_or_wait).to include('Path to redmine root:')
+    expect(@process).to have_output('Path to redmine root:')
     write(redmine_root)
 
-    expect(read_new_or_wait).to include('Path to package:')
+    expect(@process).to have_output('Path to package:')
     write('aaa')
 
-    expect(read_new_or_wait).to include("File aaa must have format: .zip, .gz, .tgz")
-    expect(read_new_or_wait).to include("File doesn't exist")
+    expect(@process).to have_output("File aaa must have format: .zip, .gz, .tgz")
   end
 
-  it 'non-exstinig package' do
+  it 'non-existinig zip package' do
     redmine_root = Dir.mktmpdir('redmine_root')
 
-    expect(read_new_or_wait).to include('Path to redmine root:')
+    expect(@process).to have_output('Path to redmine root:')
     write(redmine_root)
 
-    expect(read_new_or_wait).to include('Path to package:')
+    expect(@process).to have_output('Path to package:')
     write('aaa.zip')
 
-    expect(read_new_or_wait).to include("File doesn't exist")
+    expect(@process).to have_output("File doesn't exist")
   end
 
-  it 'install without arguments', args: [] do
+  xit 'install without arguments', args: [] do
     redmine_root = Dir.mktmpdir('redmine_root')
     regular_package = File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'redmine-3.1.0.zip'))
 
-    expect(read_new_or_wait).to include('Path to redmine root:')
+    expect(@process).to have_output('Path to redmine root:')
     write(redmine_root)
 
-    expect(read_new_or_wait).to include('Path to package:')
+    expect(@process).to have_output('Path to package:')
     write(regular_package)
 
-    out = read_new_or_wait
-    expect(out).to include('Extracting redmine package')
-    expect(out).to include('Creating database configuration')
-    expect(out).to include('What database do you want use?')
-    expect(out).to include('‣ MySQL')
+    expect(@process).to have_output('Extracting redmine package')
+    expect(@process).to have_output('Creating database configuration')
+    expect(@process).to have_output('What database do you want use?')
+    expect(@process).to have_output('‣ MySQL')
 
     write(TTY::Prompt::Reader::Codes::KEY_DOWN)
-    expect(read_new_or_wait).to include('‣ PostgreSQL')
+    expect(@process).to have_output('‣ PostgreSQL')
     write(' ')
 
-    expect(read_new_or_wait).to include('Database:')
+    expect(@process).to have_output('Database:')
     write('test')
 
-    expect(read_new_or_wait).to include('Host: (localhost)')
+    expect(@process).to have_output('Host: (localhost)')
     write('')
 
-    expect(read_new_or_wait).to include('Username:')
+    expect(@process).to have_output('Username:')
     write('postgres')
 
-    expect(read_new_or_wait).to include('Password:')
+    expect(@process).to have_output('Password:')
     write('postgres')
 
-    expect(read_new_or_wait).to include('Encoding: (utf8)')
+    expect(@process).to have_output('Encoding: (utf8)')
     write('')
 
-    expect(read_new_or_wait).to include('Port: (5432)')
+    expect(@process).to have_output('Port: (5432)')
     write('')
 
-    out = read_new_or_wait
-    expect(out).to include('Creating email configuration')
-    expect(out).to include('Which service to use for email sending?')
-    expect(out).to include('‣ Nothing')
+    expect(@process).to have_output('Creating email configuration')
+    expect(@process).to have_output('Which service to use for email sending?')
+    expect(@process).to have_output('‣ Nothing')
     write(' ')
 
-    out = read_new_and_wait_for('Redmine was installed')
-    expect(out).to include('Redmine installing')
-    expect(out).to include('--> Bundle install')
-    expect(out).to include('--> Database creating')
-    expect(out).to include('--> Database migrating')
-    expect(out).to include('--> Plugins migration')
-    expect(out).to include('--> Generating secret token')
+    expect(@process).to have_output('Redmine was installed')
+    expect(@process).to have_output('Redmine installing')
+    expect(@process).to have_output('--> Bundle install')
+    expect(@process).to have_output('--> Database creating')
+    expect(@process).to have_output('--> Database migrating')
+    expect(@process).to have_output('--> Plugins migration')
+    expect(@process).to have_output('--> Generating secret token')
 
-    expect(out).to include('Cleaning root ... OK')
-    expect(out).to include('Moving redmine to target directory ... OK')
-    expect(out).to include('Cleanning up ... OK')
-    expect(out).to include('Moving installer log ... OK')
+    expect(@process).to have_output('Cleaning root ... OK')
+    expect(@process).to have_output('Moving redmine to target directory ... OK')
+    expect(@process).to have_output('Cleanning up ... OK')
+    expect(@process).to have_output('Moving installer log ... OK')
   end
 
   # it 'package', args: ['/home/ondra/Downloads/redmine-3.3.0.zip'] do
