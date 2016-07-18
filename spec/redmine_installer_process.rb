@@ -15,7 +15,7 @@ class RedmineInstallerProcess
     @process.io.stdout = tempfile_out
     @process.io.stderr = tempfile_err
     @process.environment['REDMINE_INSTALLER_SPEC'] = '1'
-    @process.environment['REDMINE_INSTALLER_LOGFILE'] = File.expand_path(File.join(File.dirname(__FILE__), 'log.log'))
+    @process.environment['REDMINE_INSTALLER_LOGFILE'] = File.expand_path(File.join(File.dirname(__FILE__), '..', 'log.log'))
     @process.duplex = true
     @process.detach = true
 
