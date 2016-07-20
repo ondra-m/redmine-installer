@@ -2,6 +2,10 @@ require 'spec_helper'
 
 RSpec.describe RedmineInstaller::Install do
 
+  def self.package_v310
+    File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'redmine-3.1.0.zip'))
+  end
+
   def self.package_someting_else
     File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'something-else.zip'))
   end
@@ -148,8 +152,6 @@ RSpec.describe RedmineInstaller::Install do
     expected_redmine_version('3.1.1')
   end
 
-
-
   it 'installing something else', args: [package_someting_else] do
     write(@redmine_root)
 
@@ -167,6 +169,53 @@ RSpec.describe RedmineInstaller::Install do
     write(' ')
 
     expected_output('Operation canceled by user')
+  end
+
+  it 'bad database settings', args: [package_v310] do
+    write(@redmine_root)
+
+    expected_output('Creating database configuration')
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expected_output('‣ PostgreSQL')
+    write(' ')
+
+    write('test')
+    write('')
+    write('testtesttest')
+    sleep 0.5 # wait for buffer
+    write('postgres')
+    write('')
+    write('')
+
+    expected_output('Creating email configuration')
+    write(' ')
+
+    expected_output('Redmine installing')
+    expected_output_in('--> Database migrating', 60)
+    expected_output('Migration end with error')
+    expected_output('‣ Try again')
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expected_output('‣ Change database configuration')
+    write(' ')
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expected_output('‣ PostgreSQL')
+    write(' ')
+
+    write('test')
+    write('')
+    write('postgres')
+    sleep 0.5 # wait for buffer
+    write('postgres')
+    write('')
+    write('')
+
+    expected_output('--> Database migrating')
+    expected_output_in('Redmine was installed', 60)
+
+    expected_redmine_version('3.1.0')
   end
 
   # it 'package', args: ['/home/ondra/Downloads/redmine-3.3.0.zip'] do
