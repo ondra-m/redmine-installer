@@ -28,6 +28,13 @@ class RedmineInstallerProcess
     @seek = 0
   end
 
+  def run
+    start
+    yield
+  ensure
+    stop
+  end
+
   def start
     @process.start
   end
