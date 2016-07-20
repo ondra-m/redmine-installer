@@ -1,93 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe RedmineInstaller::Install do
-
-  def self.package_v310
-    File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'redmine-3.1.0.zip'))
-  end
-
-  def self.package_someting_else
-    File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'something-else.zip'))
-  end
-
-  around(:each) do |example|
-    @process = RedmineInstallerProcess.new('install', example.metadata[:args])
-    @process.run do
-      Dir.mktmpdir('redmine_root') do |dir|
-        @redmine_root = dir
-        example.run
-      end
-    end
-  end
-
-  def expected_output(text)
-    expect(@process).to have_output(text)
-  end
-
-  def expected_output_in(text, max_wait)
-    expect(@process).to have_output_in(text, max_wait)
-  end
-
-  def write(text)
-    @process.write(text)
-  end
-
-  def expected_successful_configuration
-    expected_output('Creating database configuration')
-    expected_output('What database do you want use?')
-    expected_output('‣ MySQL')
-
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
-    expected_output('‣ PostgreSQL')
-    write(' ')
-
-    expected_output('Database:')
-    write('test')
-
-    expected_output('Host: (localhost)')
-    write('')
-
-    expected_output('Username:')
-    write('postgres')
-
-    expected_output('Password:')
-    write('postgres')
-
-    expected_output('Encoding: (utf8)')
-    write('')
-
-    expected_output('Port: (5432)')
-    write('')
-
-    expected_output('Creating email configuration')
-    expected_output('Which service to use for email sending?')
-    expected_output('‣ Nothing')
-    write(' ')
-  end
-
-  def expected_successful_installation
-    expected_output('Redmine installing')
-    expected_output_in('--> Bundle install', 50)
-    expected_output_in('--> Database creating', 50)
-    expected_output_in('--> Database migrating', 50)
-    expected_output_in('--> Plugins migration', 50)
-    expected_output_in('--> Generating secret token', 50)
-
-    expected_output('Cleaning root ... OK')
-    expected_output('Moving redmine to target directory ... OK')
-    expected_output('Cleanning up ... OK')
-    expected_output('Moving installer log ... OK')
-
-    expected_output('Redmine was installed')
-  end
-
-  def expected_redmine_version(version)
-    Dir.chdir(@redmine_root) do
-      out = `rails runner "puts Redmine::VERSION.to_s"`
-      expect($?.success?).to be_truthy
-      expect(out).to include(version)
-    end
-  end
+RSpec.describe RedmineInstaller::Install, command: 'install' do
 
   it 'bad permission', args: [] do
     FileUtils.chmod(0000, @redmine_root)
@@ -217,13 +130,5 @@ RSpec.describe RedmineInstaller::Install do
 
     expected_redmine_version('3.1.0')
   end
-
-  # it 'package', args: ['/home/ondra/Downloads/redmine-3.3.0.zip'] do
-  #   binding.pry unless $__binding
-  # end
-
-  # it 'package, root', args: ['/home/ondra/Downloads/redmine-3.3.0.zip', 'test'] do
-  #   binding.pry unless $__binding
-  # end
 
 end

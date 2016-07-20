@@ -24,3 +24,5 @@ tmp
 mkmf.log
 test/*
 /log.log
+/redmine-installer-err
+/redmine-installer-out

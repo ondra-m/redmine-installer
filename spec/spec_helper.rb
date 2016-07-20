@@ -2,8 +2,13 @@ lib = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(lib) if !$LOAD_PATH.include?(lib)
 
 require 'redmine-installer'
-require 'redmine_installer_process'
+
 require 'custom_matcher'
+require 'installer_context'
+
+require 'installer_process'
+require 'installer_helper'
+require 'packages_helper'
 
 RSpec.configure do |config|
   config.default_formatter = 'doc'
@@ -11,4 +16,9 @@ RSpec.configure do |config|
   config.tty   = true
 
   config.disable_monkey_patching!
+
+  config.include_context 'run installer', :command
+
+  config.extend PackagesHelper
+  config.include InstallerHelper
 end

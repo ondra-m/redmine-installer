@@ -1,12 +1,15 @@
 require 'childprocess'
 
-class RedmineInstallerProcess
+class InstallerProcess
 
   attr_reader :stdout, :last_get_return
 
   def initialize(command, args)
-    tempfile_out = Tempfile.new('redmine-installer-out')
-    tempfile_err = Tempfile.new('redmine-installer-err')
+    # tempfile_out = Tempfile.new('redmine-installer-out')
+    # tempfile_err = Tempfile.new('redmine-installer-err')
+
+    tempfile_out = File.open('redmine-installer-out', 'w')
+    tempfile_err = File.open('redmine-installer-err', 'w')
 
     tempfile_out.sync = true
     tempfile_err.sync = true
@@ -44,7 +47,15 @@ class RedmineInstallerProcess
   end
 
   def write(text)
-    @process.io.stdin << (text + "\n")
+    # @process.io.stdin << (text + "\n")
+
+    @process.io.stdin.puts(text)
+    # @process.io.stdin.flush
+
+    # @process.io.stdin.syswrite(text + "\n")
+    # @process.io.stdin.flush
+
+    # @process.io.stdin.write_nonblock(text + "\n")
   end
 
   def get(*args)
