@@ -48,5 +48,13 @@ module RedmineInstaller
       logger.info('Redmine was upgraded')
     end
 
+    def down
+      # @temp_redmine.clean_up
+      # @package.clean_up
+
+      puts
+      puts "(Log is located on #{pastel.bold(logger.path)})"
+    end
+
   end
 end
