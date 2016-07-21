@@ -4,7 +4,7 @@ class InstallerProcess
 
   attr_reader :stdout, :last_get_return
 
-  def initialize(command, args)
+  def initialize(command, *args)
     # tempfile_out = Tempfile.new('redmine-installer-out')
     # tempfile_err = Tempfile.new('redmine-installer-err')
 
@@ -14,7 +14,7 @@ class InstallerProcess
     tempfile_out.sync = true
     tempfile_err.sync = true
 
-    @process = ChildProcess.build('bin/redmine', command, *args)
+    @process = ChildProcess.build('bin/redmine', command, *args.flatten.compact)
     @process.io.stdout = tempfile_out
     @process.io.stderr = tempfile_err
     @process.environment['REDMINE_INSTALLER_SPEC'] = '1'
@@ -47,9 +47,9 @@ class InstallerProcess
   end
 
   def write(text)
-    # @process.io.stdin << (text + "\n")
+    @process.io.stdin << text
 
-    @process.io.stdin.puts(text)
+    # @process.io.stdin.puts(text)
     # @process.io.stdin.flush
 
     # @process.io.stdin.syswrite(text + "\n")

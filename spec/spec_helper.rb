@@ -3,8 +3,8 @@ $LOAD_PATH.unshift(lib) if !$LOAD_PATH.include?(lib)
 
 require 'redmine-installer'
 
-require 'custom_matcher'
-require 'installer_context'
+require 'custom_matchers'
+require 'shared_contexts'
 
 require 'installer_process'
 require 'installer_helper'
@@ -19,6 +19,7 @@ RSpec.configure do |config|
 
   config.include_context 'run installer', :command
 
+  config.include PackagesHelper
   config.extend PackagesHelper
   config.include InstallerHelper
 end

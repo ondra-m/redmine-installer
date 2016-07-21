@@ -9,7 +9,11 @@ module InstallerHelper
   end
 
   def write(text)
-    @process.write(text)
+    @process.write(text + "\n")
+  end
+
+  def select_choice
+    @process.write(' ')
   end
 
   def expected_successful_configuration
@@ -45,10 +49,9 @@ module InstallerHelper
     write(' ')
   end
 
-  def expected_successful_installation
-    expected_output('Redmine installing')
+  def expected_successful_installation_or_upgrade(install: false, upgrade: false)
     expected_output_in('--> Bundle install', 50)
-    expected_output_in('--> Database creating', 50)
+    expected_output_in('--> Database creating', 50) if install
     expected_output_in('--> Database migrating', 50)
     expected_output_in('--> Plugins migration', 50)
     expected_output_in('--> Generating secret token', 50)
@@ -57,8 +60,18 @@ module InstallerHelper
     expected_output('Moving redmine to target directory ... OK')
     expected_output('Cleanning up ... OK')
     expected_output('Moving installer log ... OK')
+  end
 
+  def expected_successful_installation
+    expected_output('Redmine installing')
+    expected_successful_installation_or_upgrade(install: true)
     expected_output('Redmine was installed')
+  end
+
+  def expected_successful_upgrade
+    expected_output('Redmine upgrading')
+    expected_successful_installation_or_upgrade(upgrade: true)
+    expected_output('Redmine was upgraded')
   end
 
   def expected_redmine_version(version)
