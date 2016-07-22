@@ -57,6 +57,31 @@ module RedmineInstaller
       pids_files.any?
     end
 
+    def load_profile(profile)
+      @root = profile.redmine_root if root.empty?
+      @backup_type = profile.backup_type
+      @backup_root = profile.backup_root || profile.backup_dir
+
+      # Convert setting from v1
+      case @backup_type
+      when :full_backup
+        @backup_type = :full
+      when :backup, :only_database
+        @backup_type = :database
+      end
+
+      # Only valid setting
+      unless [:full, :database, :nothing].include?(@backup_type)
+        @backup_type = nil
+      end
+    end
+
+    def save_profile(profile)
+      profile.redmine_root = @root
+      profile.backup_type = @backup_type
+      profile.backup_root = @backup_root
+    end
+
     # Ask for REDMINE_ROOT (if wasnt set) and check access rights
     #
     def ensure_and_valid_root
@@ -266,16 +291,16 @@ module RedmineInstaller
     def make_backup
       print_title('Data backup')
 
-      selected = prompt.select('What type of backup do you want?',
+      @backup_type ||= prompt.select('What type of backup do you want?',
         'Full (redmine root and database)' => :full,
         'Only database' => :database,
         'Nothing' => :nothing)
 
-      logger.info("Backup type: #{selected}")
+      logger.info("Backup type: #{@backup_type}")
 
       # Dangerous option
-      if selected == :nothing
-        if prompt.yes?('Are you sure?', default: true)
+      if @backup_type == :nothing
+        if prompt.yes?('Are you sure?', default: false)
           logger.info('Backup option nothing was confirmed')
           return
         else
@@ -283,15 +308,15 @@ module RedmineInstaller
         end
       end
 
-      backup_root = prompt.ask('Where to save backup:', required: true, default: DEFAULT_BACKUP_ROOT)
-      backup_root = File.expand_path(backup_root)
+      @backup_root ||= prompt.ask('Where to save backup:', required: true, default: DEFAULT_BACKUP_ROOT)
+      @backup_root = File.expand_path(@backup_root)
 
-      @backup_dir = File.join(backup_root, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
+      @backup_dir = File.join(@backup_root, Time.now.strftime('backup_%d%m%Y_%H%M%S'))
       create_dir(@backup_dir)
 
       files_to_backup = []
       Dir.chdir(root) do
-        case selected
+        case @backup_type
         when :full
           files_to_backup = Dir.glob(File.join('**', '{*,.*}'))
         end

@@ -2,6 +2,10 @@ module RedmineInstaller
   class Upgrade < Task
 
     def up
+      if @profile
+        @target_redmine.load_profile(@profile)
+      end
+
       @environment.check
       @target_redmine.ensure_and_valid_root
       @target_redmine.validate
@@ -38,6 +42,12 @@ module RedmineInstaller
       puts
       puts pastel.bold('Redmine was upgraded')
       logger.info('Redmine was upgraded')
+
+      if @profile.nil? && prompt.yes?('Do you want save steps for further use?', default: false)
+        profile = Profile.new
+        @target_redmine.save_profile(profile)
+        profile.save
+      end
     end
 
     def down

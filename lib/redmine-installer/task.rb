@@ -7,6 +7,10 @@ module RedmineInstaller
     def initialize(package, redmine_root, **options)
       @options = OpenStruct.new(options)
 
+      if @options.profile
+        @profile = Profile.get!(@options.profile)
+      end
+
       @environment = Environment.new(self)
       @package = Package.new(self, package)
       @target_redmine = Redmine.new(self, redmine_root)

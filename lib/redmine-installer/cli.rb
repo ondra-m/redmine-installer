@@ -58,6 +58,7 @@ module RedmineInstaller
 
         c.option '--enable-user-root', 'Skip root as root validation'
         c.option '--bundle-options', String, 'Add options to bundle command'
+        c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
 
         c.action do |args, options|
           options.default(enable_user_root: false)
