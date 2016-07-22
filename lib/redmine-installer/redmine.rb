@@ -62,7 +62,7 @@ module RedmineInstaller
     def ensure_and_valid_root
       if root.empty?
         puts
-        @root = prompt.ask('Path to redmine root:', required: true, default: '.')
+        @root = prompt.ask('Path to redmine root:', required: true, default: 'redmine')
       end
 
       @root = File.expand_path(@root)
