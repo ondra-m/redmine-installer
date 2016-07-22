@@ -90,6 +90,18 @@ module RedmineInstaller
       end
     end
 
+    # Check if redmine is running based on PID files.
+    #
+    def check_running_state
+      if running?
+        if prompt.yes?("Your app is running based on PID files (#{pids_files.join(', ')}). Do you want continue?", default: false)
+          logger.warn("App is running (pids: #{pids_files.join(', ')}). Ignore it and continue.")
+        else
+          error('App is running')
+        end
+      end
+    end
+
     # Create and configure rails database
     #
     def create_database_yml
