@@ -21,17 +21,7 @@ module RedmineInstaller
       @temp_redmine.copy_importants_from(@target_redmine)
       @temp_redmine.copy_missing_plugins_from(@target_redmine)
 
-      begin
-        @temp_redmine.upgrade
-      rescue => e
-        if @target_redmine.database && @target_redmine.database.backuped?
-          addition_message = "Database have been backed up on #{pastel.bold(@target_redmine.database.backup)}."
-        else
-          addition_message = ''
-        end
-
-        error("Upgrade failed due to #{e.message}. #{addition_message}")
-      end
+      @temp_redmine.upgrade
 
       print_title('Finishing installation')
       ok('Cleaning root'){ @target_redmine.delete_root }
@@ -51,8 +41,13 @@ module RedmineInstaller
     end
 
     def down
-      # @temp_redmine.clean_up
-      # @package.clean_up
+      @temp_redmine.clean_up
+      @package.clean_up
+
+      if @target_redmine.database && @target_redmine.database.backuped?
+        puts
+        puts "Database have been backed up on #{pastel.bold(@target_redmine.database.backup)}"
+      end
 
       puts
       puts "(Log is located on #{pastel.bold(logger.path)})"

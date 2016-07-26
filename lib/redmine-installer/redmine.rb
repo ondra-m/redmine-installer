@@ -3,7 +3,7 @@ require 'find'
 module RedmineInstaller
   class Redmine < TaskModule
 
-    # attr_reader :database
+    attr_reader :database
     attr_accessor :root
 
     REQUIRED_FILES = [
