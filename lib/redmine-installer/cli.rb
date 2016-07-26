@@ -59,6 +59,7 @@ module RedmineInstaller
         c.option '--enable-user-root', 'Skip root as root validation'
         c.option '--bundle-options', String, 'Add options to bundle command'
         c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
+        c.option('--keep PATH(s)', Array, 'Keep paths, use mutliple options or separate values by comma (paths must be relative)', &method(:parse_keep_options))
 
         c.action do |args, options|
           options.default(enable_user_root: false)
@@ -83,6 +84,17 @@ module RedmineInstaller
        end
 
       run!
+    end
+
+    def parse_keep_options(values)
+      proxy_options = Commander::Runner.instance.active_command.proxy_options
+
+      saved = proxy_options.find{|switch, _| switch == :keep }
+      if saved
+        saved[1].concat(values)
+      else
+        proxy_options << [:keep, values]
+      end
     end
 
   end

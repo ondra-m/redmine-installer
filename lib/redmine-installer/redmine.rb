@@ -242,6 +242,19 @@ module RedmineInstaller
         FileUtils.cp_r(other_redmine.files_path, root)
       end
 
+      # Copy 'keep' files (base on options)
+      Array(task.options.keep).each do |path|
+        origin_path = File.join(other_redmine.root, path)
+        next unless File.exist?(origin_path)
+
+        # Ensure folder
+        target_dir = File.join(root, File.dirname(path))
+        FileUtils.mkdir_p(target_dir)
+
+        # Copy recursive
+        FileUtils.cp_r(origin_path, target_dir)
+      end
+
       logger.info('Important files was copyied')
     end
 
