@@ -31,6 +31,13 @@ RSpec.describe RedmineInstaller::Upgrade, command: 'upgrade' do
   end
 
   it 'upgrading with full backup' do
+    test_test_dir = File.join(@redmine_root, 'test_test')
+    test_test_file = File.join(test_test_dir, 'test.txt')
+    FileUtils.mkdir_p(test_test_dir)
+    FileUtils.touch(test_test_file)
+
+    expect(File.exist?(test_test_file)).to be_truthy
+
     expected_output('Path to redmine root:')
     write(@redmine_root)
 
@@ -55,7 +62,43 @@ RSpec.describe RedmineInstaller::Upgrade, command: 'upgrade' do
 
     expected_redmine_version('3.2.0')
 
-    binding.pry unless $__binding
+    expect(File.exist?(test_test_file)).to be_falsey
+
+    last_backup = Dir.glob(File.join(@backup_dir, '*')).sort.last
+    backuped = Dir.glob(File.join(last_backup, '*'))
+
+    expect(backuped.map{|f| File.zero?(f) }).to all(be_falsey)
+  end
+
+  it 'upgrade with no backup and files keeping', args: ['--keep', 'test_test'] do
+    test_test_dir = File.join(@redmine_root, 'test_test')
+    test_test_file = File.join(test_test_dir, 'test.txt')
+    FileUtils.mkdir_p(test_test_dir)
+    FileUtils.touch(test_test_file)
+
+    expect(File.exist?(test_test_file)).to be_truthy
+
+    wait_for_stdin_buffer
+    write(@redmine_root)
+
+    wait_for_stdin_buffer
+    write(package_v320)
+
+    wait_for_stdin_buffer
+
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    expected_output('‣ Nothing')
+    select_choice
+
+    expected_output('Are you sure?')
+    write('y')
+
+    expected_successful_upgrade
+
+    expected_redmine_version('3.2.0')
+
+    expect(File.exist?(test_test_file)).to be_truthy
   end
 
 end
