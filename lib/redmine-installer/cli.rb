@@ -19,6 +19,7 @@ module RedmineInstaller
 
       global_option('-d', '--debug', 'Logging message to stdout'){ $DEBUG = true }
       global_option('-s', '--silent', 'Be less version in outpur') { $SILENT_MODE = true }
+      global_option('-e', '--env', 'For backward compatibily. Now production is always use.')
       default_command :help
 
 
@@ -55,11 +56,13 @@ module RedmineInstaller
                   'redmine upgrade ~/REDMINE_PACKAGE.zip'
         c.example 'Upgrade',
                   'redmine upgrade ~/REDMINE_PACKAGE.zip redmine_root'
+        c.example 'Upgrade and keep directory',
+                  'redmine upgrade --keep git_repositories'
 
         c.option '--enable-user-root', 'Skip root as root validation'
         c.option '--bundle-options', String, 'Add options to bundle command'
         c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
-        c.option('--keep PATH(s)', Array, 'Keep paths, use mutliple options or separate values by comma (paths must be relative)', &method(:parse_keep_options))
+        c.option '--keep PATH(s)', Array, 'Keep paths, use mutliple options or separate values by comma (paths must be relative)', &method(:parse_keep_options)
 
         c.action do |args, options|
           options.default(enable_user_root: false)
