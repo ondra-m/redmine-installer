@@ -72,6 +72,9 @@ module InstallerHelper
     expected_output('Redmine upgrading')
     expected_successful_installation_or_upgrade(upgrade: true)
     expected_output('Redmine was upgraded')
+
+    expected_output('Do you want save steps for further use?')
+    write('n')
   end
 
   def expected_redmine_version(version)
@@ -80,6 +83,10 @@ module InstallerHelper
       expect($?.success?).to be_truthy
       expect(out).to include(version)
     end
+  end
+
+  def wait_for_stdin_buffer
+    sleep 0.5
   end
 
 end
