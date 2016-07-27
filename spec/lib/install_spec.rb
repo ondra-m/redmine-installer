@@ -97,7 +97,7 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     write('')
     write('testtesttest')
     sleep 0.5 # wait for buffer
-    write('postgres')
+    write(db_password)
     write('')
     write('')
 
@@ -120,9 +120,9 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
 
     write('test')
     write('')
-    write('postgres')
+    write(db_username)
     sleep 0.5 # wait for buffer
-    write('postgres')
+    write(db_password)
     write('')
     write('')
 

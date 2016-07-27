@@ -182,7 +182,7 @@ module RedmineInstaller
       end
 
       def backup_command(file)
-        if @password.empty?
+        if @password.present?
           pass = ''
         else
           pass = "PGPASSWORD=\"#{@password}\""
