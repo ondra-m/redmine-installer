@@ -58,8 +58,8 @@ module RedmineInstaller
       def get_parameters
         @database = prompt.ask('Database:', required: true)
         @host = prompt.ask('Host:', default: 'localhost', required: true)
-        @username = prompt.ask('Username:', required: true)
-        @password = prompt.mask('Password:', required: true)
+        @username = prompt.ask('Username:')
+        @password = prompt.mask('Password:')
         @encoding = prompt.ask('Encoding:', default: 'utf8', required: true)
         @port = prompt.ask('Port:', default: default_port, convert: :int, required: true)
 
@@ -104,9 +104,9 @@ module RedmineInstaller
       def build
         data = {}
         data['adapter'] = adapter_name
-        data['username'] = @username
         data['database'] = @database
-        data['password'] = @password
+        data['username'] = @username if @username.present?
+        data['password'] = @password if @password.present?
         data['encoding'] = @encoding
         data['host'] = @host
         data['port'] = @port

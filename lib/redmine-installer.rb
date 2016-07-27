@@ -63,6 +63,7 @@ require 'redmine-installer/version'
 require 'redmine-installer/errors'
 
 # Patches
+require 'redmine-installer/patches/ruby'
 require 'redmine-installer/patches/tty'
 
 if ENV['REDMINE_INSTALLER_SPEC']
