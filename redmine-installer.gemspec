@@ -23,7 +23,6 @@ Gem::Specification.new do |spec|
 
   # spec.add_runtime_dependency 'ansi'
   # spec.add_runtime_dependency 'gli'
-  # spec.add_runtime_dependency 'i18n'
   # spec.add_runtime_dependency 'notifier'
   # spec.add_runtime_dependency 'ruby-progressbar'
   # spec.add_runtime_dependency 'rubyzip'
