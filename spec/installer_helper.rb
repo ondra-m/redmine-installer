@@ -1,11 +1,11 @@
 module InstallerHelper
 
   def db_username
-    ENV['SPEC_DB_USERNAME'] || ENV['PGUSER'] || ''
+    ENV['SPEC_DB_USERNAME'].to_s
   end
 
   def db_password
-    ENV['SPEC_DB_PASSWORD'] || ENV['PGPASSWORD'] || ''
+    ENV['SPEC_DB_PASSWORD'].to_s
   end
 
   def expected_output(text)
