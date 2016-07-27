@@ -408,11 +408,15 @@ module RedmineInstaller
           puts
           selected = prompt.select('Migration end with error. Please choose one option:',
             'Try again' => :try_again,
+            'Create database first' => :create_database,
             'Change database configuration' => :change_configuration,
             'Cancel' => :cancel)
 
           case selected
           when :try_again
+            rake_db_migrate
+          when :create_database
+            rake_db_create
             rake_db_migrate
           when :change_configuration
             create_database_yml

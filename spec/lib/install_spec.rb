@@ -110,6 +110,7 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     expected_output('‣ Try again')
 
     write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
     expected_output('‣ Change database configuration')
     write(' ')
 
