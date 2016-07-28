@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'tempfile'
+require 'bundler'
 require 'ostruct'
 require 'tmpdir'
 require 'pastel'

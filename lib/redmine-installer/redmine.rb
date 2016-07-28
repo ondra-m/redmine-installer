@@ -375,7 +375,10 @@ module RedmineInstaller
 
       def bundle_install
         gemfile = File.join(root, 'Gemfile')
-        status = run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
+
+        status = Bundler.with_clean_env {
+          run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
+        }
 
         # Even if bundle could not install all gem EXIT_SUCCESS is returned
         if !status || !File.exist?('Gemfile.lock')

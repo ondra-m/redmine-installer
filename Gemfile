@@ -8,6 +8,7 @@ gem 'tty', '>= 0.4.0'
 gem 'rubyzip'
 gem 'pastel'
 gem 'childprocess'
+gem 'pry'
 
 # gem 'ansi'
 # gem 'gli'
@@ -15,7 +16,6 @@ gem 'childprocess'
 # gem 'notifier'
 
 group :development do
-  gem 'pry'
   gem 'rspec'
 #   gem 'rspec-mocks'
 #   gem 'guard'
