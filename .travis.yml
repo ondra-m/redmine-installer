@@ -1,8 +1,8 @@
 language: ruby
 rvm:
-  - 2.3
+  - 2.2
 services:
   - postgresql
-# before_install:
+before_install:
+  - gem --version
 #   - gem update --system
-#   - gem --version
