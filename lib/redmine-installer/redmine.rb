@@ -376,6 +376,7 @@ module RedmineInstaller
       def bundle_install
         gemfile = File.join(root, 'Gemfile')
 
+        # Performance issues was detected
         status = Bundler.with_clean_env {
           run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
         }
