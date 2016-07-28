@@ -4,5 +4,7 @@ rvm:
 services:
   - postgresql
 before_install:
-  - gem --version
+  - bundle -v
+  - gem install bundler
+  - bundle -v
 #   - gem update --system
