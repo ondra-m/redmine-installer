@@ -7,6 +7,7 @@ module RedmineInstaller
   class Package < TaskModule
 
     SUPPORTED_ARCHIVE_FORMATS = ['.zip', '.gz', '.tgz']
+    TAR_LONGLINK = '././@LongLink'
 
     attr_reader :package
 
