@@ -240,6 +240,12 @@ module RedmineInstaller
 
         # Copy files
         FileUtils.cp_r(other_redmine.files_path, root)
+
+        # Copy old logs
+        FileUtils.mkdir_p(log_path)
+        Dir.glob(File.join(other_redmine.log_path, 'redmine_installer_*')).each do |log|
+          FileUtils.cp(log, log_path)
+        end
       end
 
       # Copy 'keep' files (base on options)
@@ -375,20 +381,7 @@ module RedmineInstaller
 
       def bundle_install
         gemfile = File.join(root, 'Gemfile')
-
-        # Performance issues was detected
-        # status = Bundler.with_clean_env {
-        #   run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
-        # }
-
-        # status = run_command("BUNDLE_GEMFILE=#{gemfile} bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
-
-        begin
-          bundle_gemfile = ENV.delete('BUNDLE_GEMFILE')
-          status = run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
-        ensure
-          ENV['BUNDLE_GEMFILE'] = bundle_gemfile if bundle_gemfile.present?
-        end
+        status = run_command("bundle install #{task.options.bundle_options} --gemfile #{gemfile}", 'Bundle install')
 
         # Even if bundle could not install all gem EXIT_SUCCESS is returned
         if !status || !File.exist?('Gemfile.lock')

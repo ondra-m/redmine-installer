@@ -17,7 +17,7 @@ module RedmineInstaller
       ok('Cleaning root'){ @target_redmine.delete_root }
       ok('Moving redmine to target directory'){ @target_redmine.move_from(@temp_redmine) }
       ok('Cleanning up'){ @package.clean_up }
-      ok('Moving installer log'){ logger.move_to(@target_redmine) }
+      ok('Moving installer log'){ logger.move_to(@target_redmine, suffix: 'install') }
 
       puts
       puts pastel.bold('Redmine was installed')

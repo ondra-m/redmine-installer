@@ -26,11 +26,7 @@ module RedmineInstaller
       if ENV['REDMINE_INSTALLER_LOGFILE']
         @output = File.open(ENV['REDMINE_INSTALLER_LOGFILE'], 'w')
       else
-        Dir::Tmpname.create('redmine_installer.log') do |tmpname, n, opts|
-          mode = File::RDWR | File::CREAT | File::EXCL
-          opts[:perm] = 0600
-          @output = File.open(tmpname, mode, opts)
-        end
+        @output = Tempfile.create('redmine_installer.log')
       end
     end
 
@@ -49,10 +45,10 @@ module RedmineInstaller
       @output.close
     end
 
-    def move_to(redmine)
+    def move_to(redmine, suffix: '%d%m%Y_%H%M%S')
       close
 
-      new_path = File.join(redmine.log_path, Time.now.strftime('redmine_installer_%d%m%Y_%H%M%S.log'))
+      new_path = File.join(redmine.log_path, Time.now.strftime("redmine_installer_#{suffix}.log"))
 
       FileUtils.mkdir_p(redmine.log_path)
       FileUtils.mv(path, new_path)
