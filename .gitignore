@@ -26,3 +26,4 @@ test/*
 /log.log
 /redmine-installer-err
 /redmine-installer-out
+/redmine
