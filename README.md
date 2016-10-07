@@ -1,6 +1,8 @@
-# Redmine::Installer
+**This is a documentation for new unreleased version. For current version [go there](https://github.com/easyredmine/redmine-installer/tree/v1.0.7).**
 
-Easy way how to install/upgrade Redmine or plugin
+# Redmine installer
+
+Easy way hot to install/upgrade Redmine, EasyRedmine or EasyProject.
 
 ## Installation
 
@@ -24,218 +26,60 @@ $ gem install redmine-installer
 
 ## Examples
 
-Simple install and ugrade
+### Help
 
-```
-# From archive
-$ wget http://www.redmine.org/releases/redmine-2.3.0.zip
-$ wget http://www.redmine.org/releases/redmine-2.5.0.zip
-
-$ redmine install redmine-2.3.0.zip
-$ redmine upgrade redmine-2.5.0.zip
-
-# From website
-$ redmine install v2.3.0
-$ redmine upgrade v2.5.0
-```
-
-Set languages
-
-```
-$ redmine --locale cs install redmine-2.3.0.zip
-```
-
-## Usage
-
-```
-redmine GLOBAL_FLAGS ACTION ARGUMENTS FLAGS
-```
-
-See help for more details
+To display global doucmentation for installer.
 
 ```
 redmine help
 ```
 
-#### Global flags
-
-<table>
-  <thead>
-    <tr>
-      <th>arguments</th>
-      <th>default value</th>
-      <th>description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>--verbose / -v</td>
-      <td>false</td>
-      <td>show verbosed output</td>
-    </tr>
-    <tr>
-      <td>--locale / -l</td>
-      <td>en</td>
-      <td>language for application</td>
-    </tr>
-  </tbody>
-</table>
-
-
-#### Shortcut
-
-Some commands have defined shortcut for quicker access. Fox example:
+You can also check more detailed documentation for each command.
 
 ```
-redmine install package
-# is equal as
-redmine i package
+redmine help [COMMAND]
 ```
 
-Commands shortcut.
+### Common parameters and options
+
+
+**PACKAGE:**
+- Path to package. Can be absolute or relative path.
+- You can also write specific version of Redmine (redmine package will be downloaded on that version). For example `redmine install v3.3.0`
+
+**REDMINE_ROOT:**
+- Path to directory where project will be or is installed.
+- All files must be readable and writeable for current user.
+
+**options:**
+- _**--bundle-options OPTIONS**_ Options for bundle install. For example `--bundle-options "--without rmagick"`
+- _**--silent**_ Less verbose installation.
+
+
+### Installing
+
+Create new project on empty directory. All argument are optional.
 
 ```
-i -> install
-u -> upgrade
-b -> backup
+redmine help install
+redmine install [PACKAGE] [REDMINE_ROOT] [options]
 ```
 
-#### Common flags for all command
+Allowed options:
+- _**--bundle-options OPTIONS**_
+- _**--silent**_
 
-<table>
-  <thead>
-    <tr>
-      <th>arguments</th>
-      <th>default</th>
-      <th>description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>--environment / --env / -e</td>
-      <td>production</td>
-      <td>
-        environment for redmine<br>
-        you can set more environment like: <br>
-        &nbsp;&nbsp;&nbsp;<i>--env env1,env2,env3</i>
-      </td>
-    </tr>
-  </tbody>
-</table>
+### Upgrading
 
-## Install
-
-Install new redmine instance from archive or website.
-
-#### Steps:
-
-- **1. Redmine root** - insert _path_ where redmine will be installed
-	- _path_ must point to the folder
-	- target folder must be writable
-- **2. Load package** - loading package to temporary folder
-- **3. Database configuration** - you can choose type of DB which you want to use
-	- currently: MySQL or PostgreSQL
-	- you can also skip this step and run migration manually
-- **4. Email sending configuration** - you can set email configuration
-- **5. Install** - install commands are executed
-- **6. Moving redmine** - redmine is moved from temporarily folder to given _redmine\_root_
-- **7. Webserve configuration** - you can generate setting from selected webserver
-
-#### From archive
-
-Supported archives are **.zip** and **.tar.gz**.
+Upgrade existing project with new package.
 
 ```
-redmine install PATH_TO_PACKAGE
-
-# with environment
-redmine install PATH_TO_PACKAGE --env environment
+redmine help upgrade
+redmine upgrade [PACKAGE] [REDMINE_ROOT] [options]
 ```
 
-## Upgrade
-
-Upgrading existing instance of redmine with archive or defined version. If your redmine contain plugins which are not part of new package - all these plugins will be kept otherwise are replaced with those from package.
-
-Final step will ask you if you want save steps configuration. If you say _YES_, configuration will be stored as profile so next time you can upgrade redmine faster.
-
-```
-redmine upgrade PACKAGE --profile PROFILE_ID
-```
-
-Profiles are stored on *HOME_FOLDER/.redmine-installer-profiles.yml*.
-
-#### Steps:
-
-- **1. Redmine root** - where is redmine located
-- **2. Load package** -  loading package to temporary folder
-- **3. Validation** - validation of current redmine
-- **4. Backup** - backup current instance
-	- **full backup**: complete _redmine\_root_ with database
-	- **backup** (default): only configuration file with database
-	- **database**: only database
-- **5. Upgrading** - upgrade commands are executed
-- **6. Moving redmine** - current redmine is upgraded by new files
-- **7. Profile saving** - generating profile (see profile section)
-
-
-#### From archive
-
-```
-redmine upgrade PATH_TO_PACKAGE
-
-# with environment
-redmine upgrade PATH_TO_PACKAGE --env environment
-```
-
-### Easyproject
-
-If you are using easyproject plugin and you dont want copy client modifications from old instance use switch `--skip-old-modifications`.
-
-
-## Backup
-
-```
-redmine backup
-```
-
-#### Steps:
-
-- **1. Redmine root** - where is redmine located
-- **2. Validation** - validation of current redmine
-- **3. Backup** - backup current instance
-	- **full backup**: complete _redmine\_root_ with database
-	- **backup** (default): only configuration file with database
-	- **database**: only database
-- **4. Profile saving** - generating profile (see profile section)
-
-You can choose one of 3 types.
-
-<table>
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><b>Full backup</b></td>
-      <td>archive full redmine_root folder with all you databases defined at config/database.yml</td>
-    </tr>
-    <tr>
-      <td><b>Backup</b></td>
-      <td>
-        archive
-        <ul>
-          <li>files folder</li>
-          <li>config/database.yml, config/configuration.yml</li>
-          <li>databases</li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td><b>Only database</b></td>
-      <td>archive only databases</td>
-    </tr>
-  </tbody>
-</table>
+Allowed options:
+- _**--bundle-options OPTIONS**_
+- _**--silent**_
+- _**--profile PROFILE\_ID**_ Use saved profile.
+- _**--keep**_ Keep selected files or directories. Example `--keep git_directory`
