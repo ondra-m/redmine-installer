@@ -73,7 +73,7 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     expected_output('Redmine installing')
     expected_output_in('--> Bundle install', 50)
 
-    expected_output('Could not locate Gemfile')
+    expected_output('Gemfile not found')
     expected_output('‣ Try again')
 
     write(TTY::Prompt::Reader::Codes::KEY_DOWN)

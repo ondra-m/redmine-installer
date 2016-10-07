@@ -183,9 +183,9 @@ module RedmineInstaller
 
       def backup_command(file)
         if @password.present?
-          pass = ''
-        else
           pass = "PGPASSWORD=\"#{@password}\""
+        else
+          pass = ''
         end
 
         "#{pass} pg_dump --clean #{command_args} #{@database} --file=#{file}"
