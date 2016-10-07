@@ -73,22 +73,25 @@ module RedmineInstaller
       alias_command :u, :upgrade
 
 
-       # --- Verify log -------------------------------------------------------
-       command :'verify-log' do |c|
-         c.syntax = 'verify-log LOGFILE'
-         c.description = 'Verify redmine installer log file'
+      # --- Verify log --------------------------------------------------------
+      command :'verify-log' do |c|
+        c.syntax = 'verify-log LOGFILE'
+        c.description = 'Verify redmine installer log file'
 
-         c.example 'Verify log',
-                   'redmine verify-log LOGFILE'
+        c.example 'Verify log',
+                  'redmine verify-log LOGFILE'
 
-         c.action do |args, _|
-           RedmineInstaller::Logger.verify(args[0])
-         end
-       end
+        c.action do |args, _|
+          RedmineInstaller::Logger.verify(args[0])
+        end
+      end
+
+
 
       run!
     end
 
+    # For multiple user --keep option
     def parse_keep_options(values)
       proxy_options = Commander::Runner.instance.active_command.proxy_options
 
