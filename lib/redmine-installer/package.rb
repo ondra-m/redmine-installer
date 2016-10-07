@@ -1,7 +1,6 @@
 require 'rubygems/package'
 require 'net/http'
 require 'zlib'
-require 'zip'
 require 'uri'
 
 module RedmineInstaller

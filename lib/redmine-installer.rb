@@ -5,6 +5,7 @@ require 'ostruct'
 require 'tmpdir'
 require 'pastel'
 require 'yaml'
+require 'zip'
 
 require 'tty-progressbar'
 require 'tty-spinner'
@@ -28,9 +29,10 @@ module RedmineInstaller
   autoload :Upgrade, 'redmine-installer/upgrade'
   autoload :Command, 'redmine-installer/command'
   autoload :Profile, 'redmine-installer/profile'
+  autoload :Backup, 'redmine-installer/backup'
 
   # Settings
-  MIN_SUPPORTED_RUBY = '2.0.0'
+  MIN_SUPPORTED_RUBY = '2.1.0'
 
   def self.logger
     @logger ||= RedmineInstaller::Logger.new
