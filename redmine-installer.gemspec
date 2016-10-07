@@ -21,11 +21,11 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  # spec.add_runtime_dependency 'ansi'
-  # spec.add_runtime_dependency 'gli'
-  # spec.add_runtime_dependency 'notifier'
-  # spec.add_runtime_dependency 'ruby-progressbar'
-  # spec.add_runtime_dependency 'rubyzip'
+  spec.add_runtime_dependency 'commander'
+  spec.add_runtime_dependency 'tty', '>= 0.5'
+  spec.add_runtime_dependency 'rubyzip'
+  spec.add_runtime_dependency 'pastel'
+  spec.add_runtime_dependency 'childprocess'
 
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'rake'

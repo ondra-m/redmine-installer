@@ -23,8 +23,8 @@ RSpec.configure do |config|
   config.extend PackagesHelper
   config.include InstallerHelper
 
-  config.after(:each) do
-    log_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'log.log'))
-    Kernel.system("cat #{log_file}")
-  end
+  # config.after(:each) do
+  #   log_file = File.expand_path(File.join(File.dirname(__FILE__), '..', 'log.log'))
+  #   Kernel.system("cat #{log_file}")
+  # end
 end
