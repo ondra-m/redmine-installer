@@ -27,6 +27,10 @@ module RedmineInstaller
     def initialize(task, root=nil)
       super(task)
       @root = root.to_s
+
+      if (dump = task.options.database_dump)
+        @database_dump_to_load = File.expand_path(dump)
+      end
     end
 
     def database_yml_path
@@ -160,6 +164,9 @@ module RedmineInstaller
 
         # Ensuring database
         rake_db_create
+
+        # Load database dump (if was set via CLI)
+        load_database_dump
 
         # Migrating
         rake_db_migrate
@@ -375,6 +382,9 @@ module RedmineInstaller
     end
 
     def valid_options
+      if @database_dump_to_load && !File.exist?(@database_dump_to_load)
+        error "Database dump #{@database_dump_to_load} does not exist (path is expanded)."
+      end
     end
 
     def clean_up
@@ -499,6 +509,21 @@ module RedmineInstaller
 
       def easyproject?
         Dir.entries(plugins_path).include?('easyproject')
+      end
+
+      def load_database_dump
+        return if @database_dump_to_load.nil?
+
+        selected = prompt.select('Database dump will be loaded. Before that all data must be destroy.',
+          'Skip dump loading' => :cancel,
+          'I am aware of this. Want to continue' => :continue)
+
+        if selected == :continue
+          @database.do_restore(@database_dump_to_load)
+          logger.info('Database dump was loaded.')
+        else
+          logger.info('Database dump loading was skipped.')
+        end
       end
 
   end

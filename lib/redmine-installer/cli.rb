@@ -36,7 +36,8 @@ module RedmineInstaller
                   'redmine install ~/REDMINE_PACKAGE.zip redmine_root'
 
         c.option '--enable-user-root', 'Skip root as root validation'
-        c.option '--bundle-options', String, 'Add options to bundle command'
+        c.option '--bundle-options OPTIONS', String, 'Add options to bundle command'
+        c.option '--database-dump DUMP', String, 'Load dump before migration (experimental function)'
 
         c.action do |args, options|
           options.default(enable_user_root: false)

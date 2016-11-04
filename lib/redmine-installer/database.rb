@@ -92,14 +92,14 @@ module RedmineInstaller
         Kernel.system backup_command(@backup)
       end
 
-      # def restore_from_backup
-      #   return unless backuped?
-      #
-      #   ok('Database restoring'){
-      #     Kernel.system drop_tables_command
-      #     Kernel.system restore_command(@backup)
-      #   }
-      # end
+      def do_restore(file)
+        puts 'Database cleaning'
+        Kernel.system drop_database_command
+        Kernel.system create_database_command
+
+        puts 'Database restoring'
+        Kernel.system restore_command(file)
+      end
 
       def build
         data = {}
@@ -142,24 +142,21 @@ module RedmineInstaller
         args.join(' ')
       end
 
+      def create_database_command
+        "mysql #{command_args} --execute=\"create database #{@database}\""
+      end
+
+      def drop_database_command
+        "mysql #{command_args} --execute=\"drop database #{@database}\""
+      end
+
       def backup_command(file)
         "mysqldump --add-drop-database --compact --result-file=#{file} #{command_args} #{@database}"
       end
 
-      # def restore_command(file)
-      #   "mysql #{command_args} #{@database} < #{file}"
-      # end
-
-      # def drop_tables_command
-      #   execute = "SELECT CONCAT('DROP TABLE IF EXISTS ', table_name, ';') " +
-      #             "FROM information_schema.tables " +
-      #             "WHERE table_schema = '#{@database}';"
-
-      #   drops = `mysql #{command_args} #{@database} --execute=\"#{execute}\" --silent`
-      #   drops = drops.gsub("\n", '')
-
-      #   "mysql #{command_args} #{@database} --execute=\"#{drops}\""
-      # end
+      def restore_command(file)
+        "mysql #{command_args} #{@database} < #{file}"
+      end
 
     end
 
@@ -181,14 +178,28 @@ module RedmineInstaller
         args.join(' ')
       end
 
-      def backup_command(file)
+      def cli_password
         if @password.present?
-          pass = "PGPASSWORD=\"#{@password}\""
+          "PGPASSWORD=\"#{@password}\""
         else
-          pass = ''
+          ''
         end
+      end
 
-        "#{pass} pg_dump --clean #{command_args} #{@database} --file=#{file}"
+      def create_database_command
+        "#{cli_password} psql #{command_args} --command=\"create database #{@database};\""
+      end
+
+      def drop_database_command
+        "#{cli_password} psql #{command_args} --command=\"drop database #{@database};\""
+      end
+
+      def backup_command(file)
+        "#{cli_password} pg_dump --clean #{command_args} --format=custom --file=#{file} #{@database}"
+      end
+
+      def restore_command(file)
+        "#{cli_password} pg_restore --clean #{command_args} --dbname=#{@database} #{file} 2>/dev/null"
       end
 
     end

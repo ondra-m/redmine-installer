@@ -14,22 +14,21 @@ require 'tty-prompt'
 require 'pry'
 
 module RedmineInstaller
-  # Includes
-  autoload :CLI, 'redmine-installer/cli'
-  autoload :Task, 'redmine-installer/task'
-  autoload :Install, 'redmine-installer/install'
-  autoload :Utils, 'redmine-installer/utils'
-  autoload :Logger, 'redmine-installer/logger'
-  autoload :TaskModule, 'redmine-installer/task_module'
-  autoload :Environment, 'redmine-installer/environment'
-  autoload :Redmine, 'redmine-installer/redmine'
-  autoload :Package, 'redmine-installer/package'
-  autoload :Database, 'redmine-installer/database'
+  autoload :CLI,           'redmine-installer/cli'
+  autoload :Task,          'redmine-installer/task'
+  autoload :Install,       'redmine-installer/install'
+  autoload :Utils,         'redmine-installer/utils'
+  autoload :Logger,        'redmine-installer/logger'
+  autoload :TaskModule,    'redmine-installer/task_module'
+  autoload :Environment,   'redmine-installer/environment'
+  autoload :Redmine,       'redmine-installer/redmine'
+  autoload :Package,       'redmine-installer/package'
+  autoload :Database,      'redmine-installer/database'
   autoload :Configuration, 'redmine-installer/configuration'
-  autoload :Upgrade, 'redmine-installer/upgrade'
-  autoload :Command, 'redmine-installer/command'
-  autoload :Profile, 'redmine-installer/profile'
-  autoload :Backup, 'redmine-installer/backup'
+  autoload :Upgrade,       'redmine-installer/upgrade'
+  autoload :Command,       'redmine-installer/command'
+  autoload :Profile,       'redmine-installer/profile'
+  autoload :Backup,        'redmine-installer/backup'
 
   # Settings
   MIN_SUPPORTED_RUBY = '2.1.0'
@@ -76,31 +75,3 @@ end
 Kernel.at_exit do
   RedmineInstaller.logger.finish
 end
-
-# Log any errors before exit
-# Kernel.at_exit do
-#   logger = RedmineInstaller.logger
-#
-#   if $!.nil?
-#     logger.info 'Ends successfully'
-#   else
-#     # Is already logged
-#     unless $!.is_a?(RedmineInstaller::Error)
-#       logger.error $!.message
-#       logger.error $!.backtrace
-#     end
-#   end
-#
-#   logger.close
-# end
-
-# Signal.trap('SIGINT') do
-#   if $REDMINE_INT
-#     exit 1
-#   else
-#     puts
-#     puts RedmineInstaller.pastel.bold('You sent terminate signal. Press again to cancel installer.')
-#     puts
-#     $REDMINE_INT = true
-#   end
-# end
