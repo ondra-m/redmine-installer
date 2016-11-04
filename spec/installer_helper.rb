@@ -27,6 +27,10 @@ module InstallerHelper
     # @process.write("\r\n")
   end
 
+  def go_down
+    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+  end
+
   def expected_successful_configuration
     expected_output('Creating database configuration')
     expected_output('What database do you want use?')
