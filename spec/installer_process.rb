@@ -5,9 +5,6 @@ class InstallerProcess
   attr_reader :stdout, :last_get_return
 
   def initialize(command, *args)
-    # tempfile_out = Tempfile.new('redmine-installer-out')
-    # tempfile_err = Tempfile.new('redmine-installer-err')
-
     tempfile_out = File.open('redmine-installer-out', 'w')
     tempfile_err = File.open('redmine-installer-err', 'w')
 

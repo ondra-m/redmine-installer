@@ -62,13 +62,6 @@ module RedmineInstaller
         @password = prompt.mask('Password:', default: '')
         @encoding = prompt.ask('Encoding:', default: 'utf8', required: true)
         @port = prompt.ask('Port:', default: default_port, convert: :int, required: true)
-
-        # @database = 'test'
-        # @host = 'localhost'
-        # @username = 'postgres'
-        # @password = 'postgres'
-        # @encoding = 'utf8'
-        # @port = default_port
       end
 
       def set_paramaters(definition)
@@ -92,6 +85,9 @@ module RedmineInstaller
         Kernel.system backup_command(@backup)
       end
 
+      # Recreate database should be done in 2 commands because of
+      # postgre's '--command' options which can do only 1 operations.
+      # Otherwise result is unpredictable.
       def do_restore(file)
         puts 'Database cleaning'
         Kernel.system drop_database_command

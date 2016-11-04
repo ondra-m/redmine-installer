@@ -1,27 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe RedmineInstaller::Upgrade, command: 'upgrade' do
-
-  before(:all) do
-    @redmine_root = @origin_redmine = Dir.mktmpdir('redmine_root')
-    @process = InstallerProcess.new('install', package_v310, @origin_redmine)
-    @process.run do
-      expected_successful_configuration
-      expected_successful_installation
-
-      expected_redmine_version('3.1.0')
-    end
-    @backup_dir = Dir.mktmpdir('backup_dir')
-  end
-
-  after(:all) do
-    FileUtils.remove_entry(@origin_redmine)
-    FileUtils.remove_entry(@backup_dir)
-  end
-
-  before(:each) do
-    FileUtils.cp_r(File.join(@origin_redmine, '.'), @redmine_root)
-  end
+RSpec.describe RedmineInstaller::Upgrade, :install_first, command: 'upgrade' do
 
   it 'bad redmine root', args: [] do
     FileUtils.remove_entry(File.join(@redmine_root, 'app'))
