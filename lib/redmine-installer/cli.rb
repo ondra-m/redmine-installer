@@ -89,14 +89,14 @@ module RedmineInstaller
 
       # --- Backup ------------------------------------------------------------
       command :'backup' do |c|
-        c.syntax = 'backup REDMINE_ROOT'
+        c.syntax = 'backup [REDMINE_ROOT]'
         c.description = 'Backup redmine'
 
         c.example 'Backup',
                   'redmine backup /srv/redmine'
 
         c.action do |args, _|
-          RedmineInstaller::Backup.backup(args[0])
+          RedmineInstaller::Backup.new(args[0]).run
         end
       end
       alias_command :b, :backup

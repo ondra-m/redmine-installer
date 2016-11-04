@@ -1,9 +1,12 @@
 module RedmineInstaller
-  class Backup
-    extend Utils
+  class Backup < Task
 
-    def self.backup(redmine_root)
+    def initialize(redmine_root)
+      super()
       @target_redmine = Redmine.new(self, redmine_root)
+    end
+
+    def up
       @target_redmine.ensure_and_valid_root
       @target_redmine.validate
       @target_redmine.check_running_state

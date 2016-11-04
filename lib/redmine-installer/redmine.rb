@@ -374,6 +374,9 @@ module RedmineInstaller
       logger.info('Database backed up')
     end
 
+    def valid_options
+    end
+
     def clean_up
     end
 

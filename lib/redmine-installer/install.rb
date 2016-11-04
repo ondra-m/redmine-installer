@@ -1,7 +1,17 @@
 module RedmineInstaller
   class Install < Task
 
+    def initialize(package, redmine_root, **options)
+      super(**options)
+
+      @environment = Environment.new(self)
+      @package = Package.new(self, package)
+      @target_redmine = Redmine.new(self, redmine_root)
+      @temp_redmine = Redmine.new(self)
+    end
+
     def up
+      @temp_redmine.valid_options
       @environment.check
       @target_redmine.ensure_and_valid_root
       @package.ensure_and_valid_package

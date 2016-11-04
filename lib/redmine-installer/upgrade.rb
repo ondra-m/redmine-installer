@@ -1,7 +1,11 @@
 module RedmineInstaller
-  class Upgrade < Task
+  class Upgrade < Install
 
     def up
+      if options.profile
+        @profile = Profile.get!(options.profile)
+      end
+
       if @profile
         @target_redmine.load_profile(@profile)
       end
