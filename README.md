@@ -4,6 +4,8 @@
 
 Easy way hot to install/upgrade Redmine, EasyRedmine or EasyProject.
 
+Please do not run installer on background. It may happen that process will be paused by some event. For example database may require enter password during backuping database.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -26,9 +28,7 @@ $ gem install redmine-installer
 
 ## Examples
 
-### Help
-
-To display global doucmentation for installer.
+To display global documentation for installer.
 
 ```
 redmine help
@@ -40,22 +40,6 @@ You can also check more detailed documentation for each command.
 redmine help [COMMAND]
 ```
 
-### Common parameters and options
-
-
-**PACKAGE:**
-- Path to package. Can be absolute or relative path.
-- You can also write specific version of Redmine (redmine package will be downloaded on that version). For example `redmine install v3.3.0`
-
-**REDMINE_ROOT:**
-- Path to directory where project will be or is installed.
-- All files must be readable and writeable for current user.
-
-**options:**
-- _**--bundle-options OPTIONS**_ Options for bundle install. For example `--bundle-options "--without rmagick"`
-- _**--silent**_ Less verbose installation.
-
-
 ### Installing
 
 Create new project on empty directory. All argument are optional.
@@ -65,9 +49,21 @@ redmine help install
 redmine install [PACKAGE] [REDMINE_ROOT] [options]
 ```
 
-Allowed options:
-- _**--bundle-options OPTIONS**_
-- _**--silent**_
+```
+--bundle-options OPTIONS   Options for bundle install
+--silent                   Less verbose installation
+```
+
+Examples:
+
+Install Redmine. Installer will ask for every required parameters.
+- `redmine install`
+
+Install Redmine from redmine.zip package into /srv/redmine folder.
+- `redmine install redmine.zip /srv/redmine`
+
+Install Redmine without rmgaick dependencies.  
+- `redmine install redmine.zip /srv/redmine --bundle-options "--without rmagick"`
 
 ### Upgrading
 
@@ -78,8 +74,20 @@ redmine help upgrade
 redmine upgrade [PACKAGE] [REDMINE_ROOT] [options]
 ```
 
-Allowed options:
-- _**--bundle-options OPTIONS**_
-- _**--silent**_
-- _**--profile PROFILE\_ID**_ Use saved profile.
-- _**--keep**_ Keep selected files or directories. Example `--keep git_directory`
+```
+--bundle-options OPTIONS   Options for bundle install
+--silent                   Less verbose upgrading
+--profile PROFILE_ID       Using saved profile
+--keep PATH(s)             Keep selected files or directories
+```
+
+Examples:
+
+Upgrade Redmine located on /srv/redmine with package redmine2.zip
+- `redmine upgrade redmine2.zip /srv/redmine`
+
+Upgrade Redmine and keep directory.
+- `redmine upgrade redmine2.zip /srv/redmine --keep directory_i_want_keep`
+
+Once you've saved profile you can use previouse "answer" again.
+- `redmine upgrade redmine2.zip /srv/redmine --profile 1`
