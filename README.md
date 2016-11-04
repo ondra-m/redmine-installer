@@ -91,3 +91,17 @@ Upgrade Redmine and keep directory.
 
 Once you've saved profile you can use previouse "answer" again.
 - `redmine upgrade redmine2.zip /srv/redmine --profile 1`
+
+### Backuping
+
+Backup existing project. You can backup full redmine with database or just database.
+
+```
+redmine help backup
+redmine backup [REDMINE_ROOT]
+```
+
+Examples:
+
+Backup project located on /srv/redmine
+- `redmine upgrade /srv/redmine`
