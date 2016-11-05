@@ -70,7 +70,7 @@ RSpec.describe RedmineInstaller::Upgrade, :install_first, command: 'upgrade' do
     expected_output('‣ Nothing')
     select_choice
 
-    expected_output('Are you sure?')
+    expected_output('Are you sure you dont want backup?')
     write('y')
 
     expected_successful_upgrade
