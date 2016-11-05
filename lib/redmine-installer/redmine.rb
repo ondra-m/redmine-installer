@@ -326,10 +326,11 @@ module RedmineInstaller
 
       # Dangerous option
       if @backup_type == :nothing
-        if prompt.yes?('Are you sure?', default: false)
+        if prompt.yes?('Are you sure you dont want backup?', default: false)
           logger.info('Backup option nothing was confirmed')
           return
         else
+          @backup_type = nil
           return make_backup
         end
       end

@@ -11,8 +11,6 @@ require 'tty-progressbar'
 require 'tty-spinner'
 require 'tty-prompt'
 
-require 'pry'
-
 module RedmineInstaller
   autoload :CLI,           'redmine-installer/cli'
   autoload :Task,          'redmine-installer/task'
