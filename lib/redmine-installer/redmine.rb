@@ -49,6 +49,10 @@ module RedmineInstaller
       File.join(root, 'plugins')
     end
 
+    def easy_plugins_path
+      File.join(plugins_path, 'easyproject', 'easy_plugins')
+    end
+
     def log_path
       File.join(root, 'log')
     end
@@ -274,6 +278,7 @@ module RedmineInstaller
     # New package may not have all plugins
     #
     def copy_missing_plugins_from(other_redmine)
+      # Copy missing redmine plugins
       Dir.chdir(other_redmine.plugins_path) do
         Dir.entries('.').each do |plugin|
           next if plugin == '.' || plugin == '..'
@@ -289,6 +294,21 @@ module RedmineInstaller
           unless Dir.exist?(to)
             FileUtils.cp_r(plugin, to)
           end
+        end
+      end
+
+      # Copy missing client modification plugin
+      if easyproject?
+        old_modifications = Dir.glob(File.join(other_redmine.easy_plugins_path, 'modification_*'))
+        old_modifications.each do |old_modification_path|
+          next if !File.directory?(old_modification_path)
+
+          basename = File.basename(old_modification_path)
+
+          new_modification_path = File.join(easy_plugins_path, basename)
+          next if File.exist?(new_modification_path)
+
+          FileUtils.cp_r(old_modification_path, new_modification_path)
         end
       end
     end

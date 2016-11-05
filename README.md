@@ -42,7 +42,7 @@ redmine help [COMMAND]
 
 ### Installing
 
-Create new project on empty directory. All argument are optional. Directory must be an empty or current user must have privileges to create it.
+Create new project on empty directory. All argument are optional. Directory should be empty because installer delete all content for ensuring correct installation. If directory does not exist, current user must have privileges to create it.
 
 ```
 redmine help install
@@ -62,7 +62,7 @@ Install Redmine. Installer will ask for every required parameters.
 Install Redmine from redmine.zip package into /srv/redmine folder.
 - `redmine install redmine.zip /srv/redmine`
 
-Install Redmine without rmgaick dependencies.  
+Install Redmine without rmgaick dependencies.
 - `redmine install redmine.zip /srv/redmine --bundle-options "--without rmagick"`
 
 ### Upgrading
