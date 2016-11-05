@@ -42,7 +42,7 @@ redmine help [COMMAND]
 
 ### Installing
 
-Create new project on empty directory. All argument are optional.
+Create new project on empty directory. All argument are optional. Directory must be an empty or current user must have privileges to create it.
 
 ```
 redmine help install
@@ -67,7 +67,13 @@ Install Redmine without rmgaick dependencies.
 
 ### Upgrading
 
-Upgrade existing project with new package.
+Upgrade existing project with new package. Full and correct upgrading is ensured by these steps:
+1. project is build on temporary directory
+2. previous root is deleted
+3. projects is moved to target location
+
+Since current root is deleted you should use option `--keep` if you want preserved some files.
+
 
 ```
 redmine help upgrade
