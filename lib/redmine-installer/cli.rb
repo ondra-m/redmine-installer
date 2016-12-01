@@ -18,9 +18,9 @@ module RedmineInstaller
       program :description, 'Easy way how install/upgrade redmine or plugin.'
 
       global_option('-d', '--debug', 'Logging message to stdout'){ $DEBUG = true }
-      global_option('-s', '--silent', 'Be less version in outpur') { $SILENT_MODE = true }
-      global_option('-e', '--env', 'For backward compatibily. Production is now always use.')
-      global_option('--skip-old-modifications', 'For backward compatibily. Missing modifications are now always copied.')
+      global_option('-s', '--silent', 'Be less version in output') { $SILENT_MODE = true }
+      global_option('-e', '--env', 'For backward compatibility. Production is now always use.')
+      global_option('--skip-old-modifications', 'For backward compatibility. Missing modifications are now always copied.')
       default_command :help
 
 
@@ -64,7 +64,7 @@ module RedmineInstaller
         c.option '--enable-user-root', 'Skip root as root validation'
         c.option '--bundle-options', String, 'Add options to bundle command'
         c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
-        c.option '--keep PATH(s)', Array, 'Keep paths, use mutliple options or separate values by comma (paths must be relative)', &method(:parse_keep_options)
+        c.option '--keep PATH(s)', Array, 'Keep paths, use multiple options or separate values by comma (paths must be relative)', &method(:parse_keep_options)
 
         c.action do |args, options|
           options.default(enable_user_root: false)
