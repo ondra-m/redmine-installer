@@ -111,7 +111,7 @@ module RedmineInstaller
       def get_parameters
         super
         @address = prompt.ask('Address:', required: true)
-        @port = prompt.ask('Port:', convert: :int, required: true)
+        @port = prompt.ask('Port:', convert: lambda(&:to_i), required: true)
         @domain = prompt.ask('Domain:')
         @authentication = prompt.ask('Authentication:')
         @openssl_verify = prompt.ask('Openssl verify mode:')

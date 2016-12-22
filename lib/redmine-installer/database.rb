@@ -61,7 +61,7 @@ module RedmineInstaller
         @username = prompt.ask('Username:', default: '')
         @password = prompt.mask('Password:', default: '')
         @encoding = prompt.ask('Encoding:', default: 'utf8', required: true)
-        @port = prompt.ask('Port:', default: default_port, convert: :int, required: true)
+        @port = prompt.ask('Port:', default: default_port, convert: lambda(&:to_i), required: true)
       end
 
       def set_paramaters(definition)
