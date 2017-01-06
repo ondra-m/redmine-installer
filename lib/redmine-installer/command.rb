@@ -61,13 +61,18 @@ module RedmineInstaller
 
     class SilentFormatter < BaseFormatter
 
+      def initialize
+        @output = ''
+      end
+
       def print_title(title)
         format = "[#{pastel.yellow(':spinner')}] #{title}"
         @spinner = TTY::Spinner.new(format, success_mark: pastel.green('✔'), error_mark: pastel.red('✖'))
-        @spinner.start
+        @spinner.auto_spin
       end
 
-      def print_line(*)
+      def print_line(line)
+        @output << line
       end
 
       def print_end(success)
@@ -75,6 +80,7 @@ module RedmineInstaller
           @spinner.success
         else
           @spinner.error
+          puts @output
         end
       end
 
