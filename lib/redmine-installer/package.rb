@@ -20,12 +20,16 @@ module RedmineInstaller
       if package.empty?
         @package = prompt.ask('Path to package:', required: true)
       end
-
+      
       if !File.exist?(@package)
-        if @package =~ /\Av?(\d\.\d\.\d)\Z/
-          @package = download_redmine($1)
-        else
-          error "File doesn't exist #{@package}"
+        if(uri?(@package))
+          @package = download_uri(URI(@package))
+        else  
+          if @package =~ /\Av?(\d\.\d\.\d)\Z/
+            @package = download_redmine($1)
+          else
+            error "File doesn't exist #{@package}"
+          end
         end
       end
 
@@ -82,99 +86,112 @@ module RedmineInstaller
 
     private
 
-      def download_redmine(version)
-        @temp_file = Tempfile.new(['redmine', '.zip'])
-        @temp_file.binmode
+    def uri?(string)
+      uri = URI.parse(string)
+      %w( http https ).include?(uri.scheme)
+    rescue URI::BadURIError
+      false
+    rescue URI::InvalidURIError
+      false
+    end
+    
+    
+    def download_redmine(version)
+      uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
+      download_uri(uri)
+    end
 
-        uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
+    def download_uri(uri)
+      @temp_file = Tempfile.new(['redmine', '.zip'])
+      @temp_file.binmode
 
-        Net::HTTP.start(uri.host, uri.port) do |http|
-          head = http.request_head(uri)
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        head = http.request_head(uri)
 
-          unless head.is_a?(Net::HTTPSuccess)
-            error "Cannot download redmine #{version}"
-          end
-
-          print_title("Downloading redmine #{version}")
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2, clear: true)
-
-          http.get(uri) do |data|
-            @temp_file.write(data)
-            progressbar.advance(data.size)
-          end
-
-          progressbar.finish
+        unless head.is_a?(Net::HTTPSuccess)
+          error "Cannot download redmine #{uri}"
         end
 
-        logger.info("Redmine #{version} downloaded")
+        print_title("Downloading redmine #{uri}")
+        progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2, clear: true)
 
-        @temp_file.close
-        @temp_file.path
-      end
-
-      def extract_zip
-        Zip::File.open(@package) do |zip_file|
-          # Progressbar
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: zip_file.size, frequency: 2, clear: true)
-
-          zip_file.each do |entry|
-            dest_file = File.join(@temp_dir, entry.name)
-            FileUtils.mkdir_p(File.dirname(dest_file))
-
-            entry.extract(dest_file)
-            progressbar.advance(1)
-          end
-
-          progressbar.finish
+        http.get(uri) do |data|
+          @temp_file.write(data)
+          progressbar.advance(data.size)
         end
 
+        progressbar.finish
       end
 
-      # Extract .tar.gz archive
-      # based on http://dracoater.blogspot.cz/2013/10/extracting-files-from-targz-with-ruby.html
-      #
-      # Originally tar did not support paths longer than 100 chars. GNU tar is better and they
-      # implemented support for longer paths, but it was made through a hack called ././@LongLink.
-      # Shortly speaking, if you stumble upon an entry in tar archive which path equals to above
-      # mentioned ././@LongLink, that means that the following entry path is longer than 100 chars and
-      # is truncated. The full path of the following entry is actually the value of the current entry.
-      #
-      def extract_tar_gz
-        Gem::Package::TarReader.new(Zlib::GzipReader.open(@package)) do |tar|
+      logger.info("Redmine #{uri} downloaded")
 
-          # Progressbar
-          progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: tar.count, frequency: 2, clear: true)
+      @temp_file.close
+      @temp_file.path
+    end
+      
+    def extract_zip
+      Zip::File.open(@package) do |zip_file|
+        # Progressbar
+        progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: zip_file.size, frequency: 2, clear: true)
 
-          # tar.count move position pointer to end
-          tar.rewind
+        zip_file.each do |entry|
+          dest_file = File.join(@temp_dir, entry.name)
+          FileUtils.mkdir_p(File.dirname(dest_file))
+
+          entry.extract(dest_file)
+          progressbar.advance(1)
+        end
+
+        progressbar.finish
+      end
+
+    end
+
+    # Extract .tar.gz archive
+    # based on http://dracoater.blogspot.cz/2013/10/extracting-files-from-targz-with-ruby.html
+    #
+    # Originally tar did not support paths longer than 100 chars. GNU tar is better and they
+    # implemented support for longer paths, but it was made through a hack called ././@LongLink.
+    # Shortly speaking, if you stumble upon an entry in tar archive which path equals to above
+    # mentioned ././@LongLink, that means that the following entry path is longer than 100 chars and
+    # is truncated. The full path of the following entry is actually the value of the current entry.
+    #
+    def extract_tar_gz
+      Gem::Package::TarReader.new(Zlib::GzipReader.open(@package)) do |tar|
+
+        # Progressbar
+        progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: tar.count, frequency: 2, clear: true)
+
+        # tar.count move position pointer to end
+        tar.rewind
+
+        dest_file = nil
+        tar.each do |entry|
+          if entry.full_name == TAR_LONGLINK
+            dest_file = File.join(@temp_dir, entry.read.strip)
+            next
+          end
+          dest_file ||= File.join(@temp_dir, entry.full_name)
+          if entry.directory?
+            FileUtils.rm_rf(dest_file) unless File.directory?(dest_file)
+            FileUtils.mkdir_p(dest_file, mode: entry.header.mode, verbose: false)
+          elsif entry.file?
+            FileUtils.rm_rf(dest_file) unless File.file?(dest_file)
+            File.open(dest_file, 'wb') do |f|
+              f.write(entry.read)
+            end
+            FileUtils.chmod(entry.header.mode, dest_file, verbose: false)
+          elsif entry.header.typeflag == '2' # symlink
+            File.symlink(entry.header.linkname, dest_file)
+          end
 
           dest_file = nil
-          tar.each do |entry|
-            if entry.full_name == TAR_LONGLINK
-              dest_file = File.join(@temp_dir, entry.read.strip)
-              next
-            end
-            dest_file ||= File.join(@temp_dir, entry.full_name)
-            if entry.directory?
-              FileUtils.rm_rf(dest_file) unless File.directory?(dest_file)
-              FileUtils.mkdir_p(dest_file, mode: entry.header.mode, verbose: false)
-            elsif entry.file?
-              FileUtils.rm_rf(dest_file) unless File.file?(dest_file)
-              File.open(dest_file, 'wb') do |f|
-                f.write(entry.read)
-              end
-              FileUtils.chmod(entry.header.mode, dest_file, verbose: false)
-            elsif entry.header.typeflag == '2' # symlink
-              File.symlink(entry.header.linkname, dest_file)
-            end
-
-            dest_file = nil
-            progressbar.advance(1)
-          end
-
-          progressbar.finish
+          progressbar.advance(1)
         end
+
+        progressbar.finish
       end
+    end
 
   end
 end
