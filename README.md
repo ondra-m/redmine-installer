@@ -118,8 +118,3 @@ Examples:
 Backup project located on /srv/redmine
 - `redmine upgrade /srv/redmine`
 
-
-
-
-Todo: Use url as package source
-      Install bundler if is not present
