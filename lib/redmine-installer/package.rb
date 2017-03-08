@@ -20,12 +20,16 @@ module RedmineInstaller
       if package.empty?
         @package = prompt.ask('Path to package:', required: true)
       end
-
+      
       if !File.exist?(@package)
-        if @package =~ /\Av?(\d\.\d\.\d)\Z/
-          @package = download_redmine($1)
-        else
-          error "File doesn't exist #{@package}"
+        if uri?(@package)
+          @package = download_uri(URI(@package))
+        else  
+          if @package =~ /\Av?(\d\.\d\.\d)\Z/
+            @package = download_redmine($1)
+          else
+            error "File doesn't exist #{@package}"
+          end
         end
       end
 
@@ -82,20 +86,32 @@ module RedmineInstaller
 
     private
 
+      def uri?(string)
+        uri = URI.parse(string)
+        %w( http https ).include?(uri.scheme)
+      rescue URI::BadURIError
+        false
+      rescue URI::InvalidURIError
+        false
+      end
+
       def download_redmine(version)
+        uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
+        download_uri(uri)
+      end
+
+      def download_uri(uri)
         @temp_file = Tempfile.new(['redmine', '.zip'])
         @temp_file.binmode
-
-        uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
 
         Net::HTTP.start(uri.host, uri.port) do |http|
           head = http.request_head(uri)
 
           unless head.is_a?(Net::HTTPSuccess)
-            error "Cannot download redmine #{version}"
+            error "Cannot download redmine #{uri}"
           end
 
-          print_title("Downloading redmine #{version}")
+          print_title("Downloading redmine #{uri}")
           progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2, clear: true)
 
           http.get(uri) do |data|
@@ -106,7 +122,7 @@ module RedmineInstaller
           progressbar.finish
         end
 
-        logger.info("Redmine #{version} downloaded")
+        logger.info("Redmine #{uri} downloaded")
 
         @temp_file.close
         @temp_file.path
@@ -175,6 +191,6 @@ module RedmineInstaller
           progressbar.finish
         end
       end
-
+    
   end
 end

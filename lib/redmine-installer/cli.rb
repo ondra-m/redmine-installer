@@ -31,6 +31,8 @@ module RedmineInstaller
 
         c.example 'Install from archive',
                   'redmine install ~/REDMINE_PACKAGE.zip'
+        c.example 'Install package from internet',
+                  'redmine install https://server.tld/REDMINE_PACKAGE.zip'
         c.example 'Install specific version from internet',
                   'redmine install v3.1.0'
         c.example 'Install package to new dir',
@@ -56,8 +58,10 @@ module RedmineInstaller
 
         c.example 'Upgrade with new package',
                   'redmine upgrade ~/REDMINE_PACKAGE.zip'
-        c.example 'Upgrade',
+        c.example 'Upgrade with package from internet',
                   'redmine upgrade ~/REDMINE_PACKAGE.zip redmine_root'
+        c.example 'Upgrade',
+                  'redmine upgrade https://server.tld/REDMINE_PACKAGE.zip redmine_root'
         c.example 'Upgrade and keep directory',
                   'redmine upgrade --keep git_repositories'
 

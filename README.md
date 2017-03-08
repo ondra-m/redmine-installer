@@ -46,7 +46,7 @@ Create new project on empty directory. All argument are optional. Directory shou
 
 ```
 redmine help install
-redmine install [PACKAGE] [REDMINE_ROOT] [options]
+redmine install [PACKAGE PATH or URL] [REDMINE_ROOT] [options]
 ```
 
 ```
@@ -58,6 +58,9 @@ Examples:
 
 Install Redmine. Installer will ask for every required parameters.
 - `redmine install`
+
+Install Redmine from internet 
+- `redmine install https://server.tld/REDMINE_PACKAGE.zip /srv/redmine`
 
 Install Redmine from redmine.zip package into /srv/redmine folder.
 - `redmine install redmine.zip /srv/redmine`
@@ -77,7 +80,7 @@ Since current root is deleted you should use option `--keep` if you want preserv
 
 ```
 redmine help upgrade
-redmine upgrade [PACKAGE] [REDMINE_ROOT] [options]
+redmine upgrade [PACKAGE PATH or URL] [REDMINE_ROOT] [options]
 ```
 
 ```
@@ -91,6 +94,9 @@ Examples:
 
 Upgrade Redmine located on /srv/redmine with package redmine2.zip
 - `redmine upgrade redmine2.zip /srv/redmine`
+
+Upgrade Redmine from internet 
+- `redmine upgrade https://server.tld/REDMINE_PACKAGE.zip /srv/redmine`
 
 Upgrade Redmine and keep directory.
 - `redmine upgrade redmine2.zip /srv/redmine --keep directory_i_want_keep`
@@ -111,3 +117,4 @@ Examples:
 
 Backup project located on /srv/redmine
 - `redmine upgrade /srv/redmine`
+
