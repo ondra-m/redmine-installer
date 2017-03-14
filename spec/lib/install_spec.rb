@@ -56,7 +56,7 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     expected_output('Path to redmine root:')
     write(@redmine_root)
 
-    expected_output_in('Downloading redmine 3.1.1', 20)
+    expected_output_in('Downloading http://www.redmine.org/releases/redmine-3.1.1.zip', 30)
     expected_output('Extracting redmine package')
 
     expected_successful_configuration

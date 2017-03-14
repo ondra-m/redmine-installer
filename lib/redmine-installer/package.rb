@@ -106,10 +106,10 @@ module RedmineInstaller
           head = http.request_head(uri)
 
           unless head.is_a?(Net::HTTPSuccess)
-            error "Cannot download redmine #{uri}"
+            error "Cannot download #{uri}"
           end
 
-          print_title("Downloading redmine #{uri}")
+          print_title("Downloading #{uri}")
           progressbar = TTY::ProgressBar.new(PROGRESSBAR_FORMAT, total: head['content-length'].to_i, frequency: 2, clear: true)
 
           http.get(uri) do |data|
@@ -120,7 +120,7 @@ module RedmineInstaller
           progressbar.finish
         end
 
-        logger.info("Redmine #{uri} downloaded")
+        logger.info("#{uri} downloaded")
 
         @temp_file.close
         @temp_file.path
