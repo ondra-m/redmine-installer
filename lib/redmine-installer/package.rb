@@ -20,16 +20,14 @@ module RedmineInstaller
       if package.empty?
         @package = prompt.ask('Path to package:', required: true)
       end
-      
+
       if !File.exist?(@package)
-        if uri?(@package)
-          @package = download_uri(URI(@package))
-        else  
-          if @package =~ /\Av?(\d\.\d\.\d)\Z/
-            @package = download_redmine($1)
-          else
-            error "File doesn't exist #{@package}"
-          end
+        if @package =~ /\Av?(\d\.\d\.\d)\Z/
+          @package = download_redmine_version($1)
+        elsif valid_url?(@package)
+          @package = download_from_url(@package)
+        else
+          error "File doesn't exist #{@package}"
         end
       end
 
@@ -86,21 +84,21 @@ module RedmineInstaller
 
     private
 
-      def uri?(string)
+      def valid_url?(string)
         uri = URI.parse(string)
-        %w( http https ).include?(uri.scheme)
-      rescue URI::BadURIError
-        false
-      rescue URI::InvalidURIError
+        ['http', 'https'].include?(uri.scheme)
+      rescue URI::BadURIError, URI::InvalidURIError
         false
       end
 
-      def download_redmine(version)
-        uri = URI("http://www.redmine.org/releases/redmine-#{version}.zip")
-        download_uri(uri)
+      def download_redmine_version(version)
+        url = "http://www.redmine.org/releases/redmine-#{version}.zip"
+        download_from_url(url)
       end
 
-      def download_uri(uri)
+      def download_from_url(url)
+        uri = URI.parse(url)
+
         @temp_file = Tempfile.new(['redmine', '.zip'])
         @temp_file.binmode
 
@@ -191,6 +189,6 @@ module RedmineInstaller
           progressbar.finish
         end
       end
-    
+
   end
 end
