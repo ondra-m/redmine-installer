@@ -1,52 +1,3 @@
-# $stdin.sync = true
-# $stdout.sync = true
-
-# # require 'redmine-installer/spec/cursor'
-
-# class TestPrompt < TTY::Prompt
-
-#   def initialize(*args)
-#     # @input  = StringIO.new
-#     # @output = StringIO.new
-#     # super(input: @input, output: @output)
-#     super
-#     @pastel = Pastel.new(enabled: false)
-#   end
-
-# end
-
-# module RedmineInstaller
-
-#   # def self.prompt
-#   #   @prompt ||= TestPrompt.new
-#   # end
-
-#   def self.pastel
-#     @pastel ||= Pastel.new(enabled: false)
-#   end
-
-# end
-
-# module TTY
-#   module Cursor
-
-#     singleton_methods.each do |name|
-#       class_eval <<-METHODS
-
-#         def #{name}(*)
-#           ''
-#         end
-
-#         def self.#{name}(*)
-#           ''
-#         end
-
-#       METHODS
-#     end
-
-#   end
-# end
-
 $stdin.sync = true
 $stdout.sync = true
 
@@ -72,7 +23,19 @@ class TestPrompt < TTY::Prompt
 
   def initialize(*args)
     super
+    @enabled_color = false
     @pastel = Pastel.new(enabled: false)
+  end
+
+end
+
+class TTY::Prompt::Reader::Console
+
+  def get_char(options)
+    return input.getc unless input.tty?
+    mode.raw(options[:raw]) do
+      mode.echo(options[:echo]) { input.getc }
+    end
   end
 
 end

@@ -28,7 +28,7 @@ module InstallerHelper
   end
 
   def go_down
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    write(TTY::Prompt::Reader::Codes.keys[:down])
   end
 
   def expected_successful_configuration
@@ -36,7 +36,7 @@ module InstallerHelper
     expected_output('What database do you want use?')
     expected_output('‣ MySQL')
 
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
     expected_output('‣ PostgreSQL')
     select_choice
 

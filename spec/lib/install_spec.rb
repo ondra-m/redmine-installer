@@ -76,8 +76,8 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     expected_output('Gemfile not found')
     expected_output('‣ Try again')
 
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
+    go_down
     expected_output('‣ Cancel')
     write(' ')
 
@@ -88,8 +88,7 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     write(@redmine_root)
 
     expected_output('Creating database configuration')
-
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
     expected_output('‣ PostgreSQL')
     write(' ')
 
@@ -109,12 +108,12 @@ RSpec.describe RedmineInstaller::Install, command: 'install' do
     expected_output('Migration end with error')
     expected_output('‣ Try again')
 
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
+    go_down
     expected_output('‣ Change database configuration')
     write(' ')
 
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
     expected_output('‣ PostgreSQL')
     write(' ')
 

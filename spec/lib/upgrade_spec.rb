@@ -65,8 +65,8 @@ RSpec.describe RedmineInstaller::Upgrade, :install_first, command: 'upgrade' do
 
     wait_for_stdin_buffer
 
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
-    write(TTY::Prompt::Reader::Codes::KEY_DOWN)
+    go_down
+    go_down
     expected_output('‣ Nothing')
     select_choice
 
