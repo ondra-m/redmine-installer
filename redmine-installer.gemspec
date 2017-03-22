@@ -14,7 +14,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/easyredmine/redmine-installer'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files -z`.split("\x0")
+  files = `git ls-files -z`.split("\x0")
+  files.delete_if{|f| f.start_with?('spec/packages/') }
+
+  spec.files         = files
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
