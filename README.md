@@ -59,7 +59,7 @@ Examples:
 Install Redmine. Installer will ask for every required parameters.
 - `redmine install`
 
-Install Redmine from internet 
+Install Redmine from internet
 - `redmine install https://server.tld/REDMINE_PACKAGE.zip /srv/redmine`
 
 Install Redmine from redmine.zip package into /srv/redmine folder.
@@ -95,7 +95,7 @@ Examples:
 Upgrade Redmine located on /srv/redmine with package redmine2.zip
 - `redmine upgrade redmine2.zip /srv/redmine`
 
-Upgrade Redmine from internet 
+Upgrade Redmine from internet
 - `redmine upgrade https://server.tld/REDMINE_PACKAGE.zip /srv/redmine`
 
 Upgrade Redmine and keep directory.
@@ -115,6 +115,19 @@ redmine backup [REDMINE_ROOT]
 
 Examples:
 
-Backup project located on /srv/redmine
+Backup project located in /srv/redmine
 - `redmine upgrade /srv/redmine`
 
+### Restoring database
+
+Restore database dump to redmine.
+
+```
+redmine help restore-db
+redmine restore-db DATABASE_DUMP [REDMINE_ROOT] [options]
+```
+
+Examples:
+
+Restore database db.dump for redmine in /srv/redmine
+- `redmine restore-db db.dump /srv/redmine`
