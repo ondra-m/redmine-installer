@@ -94,7 +94,7 @@ module RedmineInstaller
 
 
       # --- Backup ------------------------------------------------------------
-      command :'backup' do |c|
+      command :backup do |c|
         c.syntax = 'backup [REDMINE_ROOT]'
         c.description = 'Backup redmine'
 
@@ -106,6 +106,24 @@ module RedmineInstaller
         end
       end
       alias_command :b, :backup
+
+
+      # --- Restore db --------------------------------------------------------
+      command :'restore-db' do |c|
+        c.syntax = 'restore-db DATABASE_DUMP [REDMINE_ROOT] [options]'
+        c.description = 'Restore database and delete old data'
+
+        c.example 'Restore DB',
+                  'redmine restore-db /srv/redmine.sql'
+
+        c.option '--enable-user-root', 'Skip root as root validation'
+
+        c.action do |args, options|
+          options.default(enable_user_root: false)
+
+          RedmineInstaller::RestoreDB.new(args[0], args[1]).run
+        end
+      end
 
 
       run!

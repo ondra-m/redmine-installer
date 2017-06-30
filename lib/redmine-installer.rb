@@ -27,6 +27,7 @@ module RedmineInstaller
   autoload :Command,       'redmine-installer/command'
   autoload :Profile,       'redmine-installer/profile'
   autoload :Backup,        'redmine-installer/backup'
+  autoload :RestoreDB,     'redmine-installer/restore_db'
 
   # Settings
   MIN_SUPPORTED_RUBY = '2.1.0'

@@ -210,6 +210,26 @@ module RedmineInstaller
       end
     end
 
+    def restore_db
+      print_title('Database restoring')
+
+      @database = Database.init(self)
+
+      Dir.chdir(root) do
+        # Load database dump (if was set via CLI)
+        load_database_dump
+
+        # Migrating
+        rake_db_migrate
+
+        # Plugin migrating
+        rake_redmine_plugin_migrate
+
+        # Install easyproject
+        rake_easyproject_install if easyproject?
+      end
+    end
+
     # # => ['.', '..']
     # def empty_root?
     #   Dir.entries(root).size <= 2
@@ -403,7 +423,7 @@ module RedmineInstaller
     end
 
     def valid_options
-      if @database_dump_to_load && !File.exist?(@database_dump_to_load)
+      if @database_dump_to_load && !(File.exist?(@database_dump_to_load) && File.file?(@database_dump_to_load))
         error "Database dump #{@database_dump_to_load} does not exist (path is expanded)."
       end
     end
