@@ -11,7 +11,13 @@ class InstallerProcess
     tempfile_out.sync = true
     tempfile_err.sync = true
 
-    @process = ChildProcess.build('bin/redmine', command, *args.flatten.compact)
+    args = args.flatten.compact
+
+    if ['install', 'upgrade'].include?(command)
+      args << '--bundle-options' << '--without rmagick'
+    end
+
+    @process = ChildProcess.build('bin/redmine', command, *args)
     @process.io.stdout = tempfile_out
     @process.io.stderr = tempfile_err
     @process.environment['REDMINE_INSTALLER_SPEC'] = '1'

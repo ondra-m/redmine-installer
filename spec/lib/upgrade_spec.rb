@@ -80,4 +80,33 @@ RSpec.describe RedmineInstaller::Upgrade, :install_first, command: 'upgrade' do
     expect(File.exist?(test_test_file)).to be_truthy
   end
 
+  it 'copy files with symlink ', args: ['--copy-files-with-symlink'] do
+    files_dir = File.join(@redmine_root, 'files')
+    files = (0..10).map {|i| File.join(files_dir, "file_#{i}.txt") }
+    FileUtils.touch(files)
+
+    wait_for_stdin_buffer
+    write(@redmine_root)
+
+    wait_for_stdin_buffer
+    write(package_v320)
+
+    wait_for_stdin_buffer
+
+    go_down
+    go_down
+    expected_output('‣ Nothing')
+    select_choice
+
+    expected_output('Are you sure you dont want backup?')
+    write('y')
+
+    expected_successful_upgrade
+
+    expected_redmine_version('3.2.0')
+
+    # Not bullet-prof but at least check if files are still there
+    expect(Dir.glob(File.join(files_dir, '*.txt')).sort).to eq(files.sort)
+  end
+
 end

@@ -24,6 +24,8 @@ module RedmineInstaller
 
     CHECK_N_INACCESSIBLE_FILES = 10
 
+    FILES_DIR = 'files'
+
     def initialize(task, root=nil)
       super(task)
       @root = root.to_s
@@ -42,7 +44,7 @@ module RedmineInstaller
     end
 
     def files_path
-      File.join(root, 'files')
+      File.join(root, FILES_DIR)
     end
 
     def plugins_path
@@ -55,6 +57,10 @@ module RedmineInstaller
 
     def log_path
       File.join(root, 'log')
+    end
+
+    def bundle_path
+      File.join(root, '.bundle')
     end
 
     def pids_files
@@ -239,6 +245,8 @@ module RedmineInstaller
       Dir.chdir(root) do
         Dir.entries('.').each do |entry|
           next if entry == '.' || entry == '..'
+          next if entry == FILES_DIR && task.options.copy_files_with_symlink
+
           FileUtils.remove_entry_secure(entry)
         end
       end
@@ -250,7 +258,12 @@ module RedmineInstaller
       Dir.chdir(other_redmine.root) do
         Dir.entries('.').each do |entry|
           next if entry == '.' || entry == '..'
-          FileUtils.mv(entry, root)
+
+          if entry == FILES_DIR && task.options.copy_files_with_symlink
+            FileUtils.rm(entry)
+          else
+            FileUtils.mv(entry, root)
+          end
         end
       end
 
@@ -270,12 +283,23 @@ module RedmineInstaller
         end
 
         # Copy files
-        FileUtils.cp_r(other_redmine.files_path, root)
+        if task.options.copy_files_with_symlink
+          FileUtils.rm_rf(files_path)
+          FileUtils.ln_s(other_redmine.files_path, root)
+        else
+          FileUtils.cp_r(other_redmine.files_path, root)
+        end
 
         # Copy old logs
         FileUtils.mkdir_p(log_path)
         Dir.glob(File.join(other_redmine.log_path, 'redmine_installer_*')).each do |log|
           FileUtils.cp(log, log_path)
+        end
+
+        # Copy bundle config
+        if Dir.exist?(other_redmine.bundle_path)
+          FileUtils.mkdir_p(bundle_path)
+          FileUtils.cp_r(other_redmine.bundle_path, root)
         end
       end
 

@@ -66,12 +66,13 @@ module RedmineInstaller
                   'redmine upgrade --keep git_repositories'
 
         c.option '--enable-user-root', 'Skip root as root validation'
-        c.option '--bundle-options', String, 'Add options to bundle command'
+        c.option '--bundle-options OPTIONS', String, 'Add options to bundle command'
         c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
         c.option '--keep PATH(s)', Array, 'Keep paths, use multiple options or separate values by comma (paths must be relative)', &method(:parse_keep_options)
+        c.option '--copy-files-with-symlink', 'Files will be referenced by symlinks instead of copying files. Only for advance users.'
 
         c.action do |args, options|
-          options.default(enable_user_root: false)
+          options.default(enable_user_root: false, copy_files_with_symlink: false)
 
           RedmineInstaller::Upgrade.new(args[0], args[1], options.__hash__).run
         end
