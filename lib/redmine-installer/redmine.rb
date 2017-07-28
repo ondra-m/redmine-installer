@@ -43,6 +43,10 @@ module RedmineInstaller
       File.join(root, 'config', 'configuration.yml')
     end
 
+    def gemfile_local_path
+      File.join(root, 'Gemfile.local')
+    end
+
     def files_path
       File.join(root, FILES_DIR)
     end
@@ -280,6 +284,11 @@ module RedmineInstaller
         # Copy configuration.yml
         if File.exist?(other_redmine.configuration_yml_path)
           FileUtils.cp(other_redmine.configuration_yml_path, configuration_yml_path)
+        end
+
+        # Copy Gemfile.local
+        if File.exist?(other_redmine.gemfile_local_path)
+          FileUtils.cp(other_redmine.gemfile_local_path, gemfile_local_path)
         end
 
         # Copy files
