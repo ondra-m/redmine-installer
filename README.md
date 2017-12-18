@@ -1,5 +1,3 @@
-**This is a documentation for new unreleased version. For current version [go there](https://github.com/easyredmine/redmine-installer/tree/v1.0.7).**
-
 # Redmine installer
 
 Easy way hot to install/upgrade Redmine, EasyRedmine or EasyProject.
