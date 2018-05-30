@@ -1,5 +1,3 @@
-module Redmine
-  module Installer
-    VERSION = '1.0.1'
-  end
+module RedmineInstaller
+  VERSION = '2.0.2'
 end

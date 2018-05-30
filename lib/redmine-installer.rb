@@ -1,72 +1,76 @@
-module Redmine
-  module Installer
-    autoload :CLI,          'redmine-installer/cli'
-    autoload :Task,         'redmine-installer/task'
-    autoload :Utils,        'redmine-installer/utils'
-    autoload :Step,         'redmine-installer/step'
-    autoload :ConfigParams, 'redmine-installer/config_param'
-    autoload :Plugin,       'redmine-installer/plugin'
-    autoload :Helper,       'redmine-installer/helper'
-    autoload :Command,      'redmine-installer/command'
-    autoload :Exec,         'redmine-installer/exec'
-    autoload :Profile,      'redmine-installer/profile'
-    autoload :Git,          'redmine-installer/git'
+require 'fileutils'
+require 'tempfile'
+require 'bundler'
+require 'ostruct'
+require 'tmpdir'
+require 'pastel'
+require 'yaml'
+require 'zip'
 
-    # Root of the gem
-    def self.root_path
-      @root_path ||= File.expand_path('..', File.dirname(__FILE__))
-    end
+require 'tty-progressbar'
+require 'tty-spinner'
+require 'tty-prompt'
 
-    # Path to locales dir
-    def self.locales_path
-      @locales_path ||= File.join(root_path, 'lib', 'redmine-installer', 'locales')
-    end
+module RedmineInstaller
+  autoload :CLI,           'redmine-installer/cli'
+  autoload :Task,          'redmine-installer/task'
+  autoload :Install,       'redmine-installer/install'
+  autoload :Utils,         'redmine-installer/utils'
+  autoload :Logger,        'redmine-installer/logger'
+  autoload :TaskModule,    'redmine-installer/task_module'
+  autoload :Environment,   'redmine-installer/environment'
+  autoload :Redmine,       'redmine-installer/redmine'
+  autoload :Package,       'redmine-installer/package'
+  autoload :Database,      'redmine-installer/database'
+  autoload :Configuration, 'redmine-installer/configuration'
+  autoload :Upgrade,       'redmine-installer/upgrade'
+  autoload :Command,       'redmine-installer/command'
+  autoload :Profile,       'redmine-installer/profile'
+  autoload :Backup,        'redmine-installer/backup'
+  autoload :RestoreDB,     'redmine-installer/restore_db'
 
-    # Locales for I18n
-    def self.locales
-      @locales ||= Dir.glob(File.join(locales_path, '*.yml'))
-    end
+  # Settings
+  MIN_SUPPORTED_RUBY = '2.1.0'
 
-    # Default configurations fo I18n gem
-    def self.set_i18n
-      I18n.enforce_available_locales = false
-      I18n.load_path = Redmine::Installer.locales
-      I18n.locale = :en
-      I18n.default_locale = :en
-    end
+  def self.logger
+    @logger ||= RedmineInstaller::Logger.new
+  end
 
-    def self.print_logo
-      $stdout.puts <<-PRINT
-                    _             _                     
-     _ __  ___   __| | _ __ ___  (_) _ __    ___        
-    | '__|/ _ \\ / _` || '_ ` _ \\ | || '_ \\  / _ \\ _____ 
-    | |  |  __/| (_| || | | | | || || | | ||  __/|_____|
-    |_|   \\___| \\__,_||_| |_| |_||_||_| |_| \\___|       
-     _              _          _  _             
-    (_) _ __   ___ | |_  __ _ | || |  ___  _ __ 
-    | || '_ \\ / __|| __|/ _` || || | / _ \\| '__|
-    | || | | |\\__ \\| |_| (_| || || ||  __/| |   
-    |_||_| |_||___/ \\__|\\__,_||_||_| \\___||_|  
+  def self.prompt
+    @prompt ||= TTY::Prompt.new
+  end
 
-    #{I18n.translate(:powered_by)}
+  def self.pastel
+    @pastel ||= Pastel.new
+  end
 
-      PRINT
-    end
+  def self.print_logo
+    puts <<-PRINT
+                __      _
+    _______ ___/ /_ _  (_)__  ___
+   / __/ -_) _  /  ' \\/ / _ \\/ -_)
+  /_/  \\__/\\_,_/_/_/_/_/_//_/\\__/
 
+
+  Powered by EasyRedmine
+
+    PRINT
   end
 end
 
-# Requirements
-require 'pry'
-require 'i18n'
-require 'redmine-installer/version'
-require 'redmine-installer/error'
-require 'redmine-installer/ext/string'
-require 'redmine-installer/ext/module'
-require 'redmine-installer/install'
-require 'redmine-installer/upgrade'
-require 'redmine-installer/backup'
 
-# Default configurations
-Redmine::Installer.set_i18n
-Redmine::Installer.print_logo
+# Requirements
+require 'redmine-installer/version'
+require 'redmine-installer/errors'
+
+# Patches
+require 'redmine-installer/patches/ruby'
+require 'redmine-installer/patches/tty'
+
+if ENV['REDMINE_INSTALLER_SPEC']
+  require 'redmine-installer/spec/spec'
+end
+
+Kernel.at_exit do
+  RedmineInstaller.logger.finish
+end

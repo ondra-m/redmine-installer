@@ -1,89 +1,145 @@
-require 'gli'
+require 'commander'
 
-module Redmine::Installer
+module Commander
+  module UI
+    # Disable paging for 'classic' help
+    def self.enable_paging
+    end
+  end
+end
+
+module RedmineInstaller
   class CLI
-    extend GLI::App
+    include Commander::Methods
 
-    def self.spec
-      @spec ||= Gem::Specification::load('redmine-installer.gemspec')
+    def run
+      program :name, 'Ruby installer'
+      program :version, RedmineInstaller::VERSION
+      program :description, 'Easy way how install/upgrade redmine or plugin.'
+
+      global_option('-d', '--debug', 'Logging message to stdout'){ $DEBUG = true }
+      global_option('-s', '--silent', 'Be less version in output') { $SILENT_MODE = true }
+      global_option('-e', '--env', 'For backward compatibility. Production is now always use.')
+      global_option('--skip-old-modifications', 'For backward compatibility. Missing modifications are now always copied.')
+      default_command :help
+
+
+      # --- Install -----------------------------------------------------------
+      command :install do |c|
+        c.syntax = 'install [PACKAGE] [REDMINE_ROOT] [options]'
+        c.description = 'Install redmine or easyredmine'
+
+        c.example 'Install from archive',
+                  'redmine install ~/REDMINE_PACKAGE.zip'
+        c.example 'Install package from internet',
+                  'redmine install https://server.tld/REDMINE_PACKAGE.zip'
+        c.example 'Install specific version from internet',
+                  'redmine install v3.1.0'
+        c.example 'Install package to new dir',
+                  'redmine install ~/REDMINE_PACKAGE.zip redmine_root'
+
+        c.option '--enable-user-root', 'Skip root as root validation'
+        c.option '--bundle-options OPTIONS', String, 'Add options to bundle command'
+        c.option '--database-dump DUMP', String, 'Load dump before migration (experimental function)'
+
+        c.action do |args, options|
+          options.default(enable_user_root: false)
+
+          RedmineInstaller::Install.new(args[0], args[1], options.__hash__).run
+        end
+      end
+      alias_command :i, :install
+
+
+      # --- Upgrade -----------------------------------------------------------
+      command :upgrade do |c|
+        c.syntax = 'upgrade [PACKAGE] [REDMINE_ROOT] [options]'
+        c.description = 'Upgrade redmine or easyredmine'
+
+        c.example 'Upgrade with new package',
+                  'redmine upgrade ~/REDMINE_PACKAGE.zip'
+        c.example 'Upgrade with package from internet',
+                  'redmine upgrade ~/REDMINE_PACKAGE.zip redmine_root'
+        c.example 'Upgrade',
+                  'redmine upgrade https://server.tld/REDMINE_PACKAGE.zip redmine_root'
+        c.example 'Upgrade and keep directory',
+                  'redmine upgrade --keep git_repositories'
+
+        c.option '--enable-user-root', 'Skip root as root validation'
+        c.option '--bundle-options OPTIONS', String, 'Add options to bundle command'
+        c.option '-p', '--profile PROFILE_ID', Integer, 'Use saved profile'
+        c.option '--keep PATH(s)', Array, 'Keep paths, use multiple options or separate values by comma (paths must be relative)', &method(:parse_keep_options)
+        c.option '--copy-files-with-symlink', 'Files will be referenced by symlinks instead of copying files. Only for advance users.'
+
+        c.action do |args, options|
+          options.default(enable_user_root: false, copy_files_with_symlink: false)
+
+          RedmineInstaller::Upgrade.new(args[0], args[1], options.__hash__).run
+        end
+      end
+      alias_command :u, :upgrade
+
+
+      # --- Verify log --------------------------------------------------------
+      command :'verify-log' do |c|
+        c.syntax = 'verify-log LOGFILE'
+        c.description = 'Verify redmine installer log file'
+
+        c.example 'Verify log',
+                  'redmine verify-log LOGFILE'
+
+        c.action do |args, _|
+          RedmineInstaller::Logger.verify(args[0])
+        end
+      end
+
+
+      # --- Backup ------------------------------------------------------------
+      command :backup do |c|
+        c.syntax = 'backup [REDMINE_ROOT]'
+        c.description = 'Backup redmine'
+
+        c.example 'Backup',
+                  'redmine backup /srv/redmine'
+
+        c.action do |args, _|
+          RedmineInstaller::Backup.new(args[0]).run
+        end
+      end
+      alias_command :b, :backup
+
+
+      # --- Restore db --------------------------------------------------------
+      command :'restore-db' do |c|
+        c.syntax = 'restore-db DATABASE_DUMP [REDMINE_ROOT] [options]'
+        c.description = 'Restore database and delete old data'
+
+        c.example 'Restore DB',
+                  'redmine restore-db /srv/redmine.sql'
+
+        c.option '--enable-user-root', 'Skip root as root validation'
+
+        c.action do |args, options|
+          options.default(enable_user_root: false)
+
+          RedmineInstaller::RestoreDB.new(args[0], args[1]).run
+        end
+      end
+
+
+      run!
     end
 
-    def self.start(argv)
-      # Program settings
-      program_desc I18n.translate(:redmine_installer_summary)
-      version Redmine::Installer::VERSION
+    # For multiple user --keep option
+    def parse_keep_options(values)
+      proxy_options = Commander::Runner.instance.active_command.proxy_options
 
-      # Global options
-
-      # Verbose
-      desc I18n.translate(:cli_show_verbose_output)
-      default_value false
-      switch [:d, :v, :debug, :verbose], negatable: false
-
-      # Locale
-      default_value 'en'
-      flag [:l, :locale]
-
-      # Before all action
-      pre do |global_options, command, options, args|
-        $verbose = global_options[:debug]
-        I18n.locale = global_options[:locale]
-        true
+      saved = proxy_options.find{|switch, _| switch == :keep }
+      if saved
+        saved[1].concat(values)
+      else
+        proxy_options << [:keep, values]
       end
-
-      # Install command
-      desc I18n.translate(:cli_install_desc)
-      arg :package
-      command [:i, :install] do |c|
-        c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git'],
-                              desc: I18n.translate(:cli_flag_source)
-
-        c.flag [:b, :branch], default_value: 'master',
-                              desc: I18n.translate(:cli_flag_branch)
-
-        c.flag [:e, :env, :environment], default_value: ['production'],
-                                         desc: I18n.translate(:cli_flag_environment),
-                                         type: Array
-
-        c.action do |global_options, options, args|
-          run_action('install', args.first, options)
-        end
-      end
-
-      # Upgrade command
-      desc I18n.translate(:cli_upgrade_desc)
-      arg :package
-      command [:u, :upgrade] do |c|
-        c.flag [:p, :profile]
-        c.flag [:s, :source], default_value: 'file',
-                              must_match: ['file', 'git'],
-                              desc: I18n.translate(:cli_flag_source)
-
-        c.flag [:e, :env, :environment], default_value: ['production'],
-                                         desc: I18n.translate(:cli_flag_environment),
-                                         type: Array
-
-        c.action do |global_options, options, args|
-          run_action('upgrade', args.first, options)
-        end
-      end
-
-      # Backup command
-      desc I18n.translate(:cli_backup_desc)
-      arg :redmine_root
-      command [:b, :backup] do |c|
-        c.flag [:p, :profile]
-        c.action do |global_options, options, args|
-          run_action('backup', args.first, options)
-        end
-      end
-
-      run(argv)
-    end
-
-    def self.run_action(action, *args)
-      Redmine::Installer.const_get(action.capitalize).new(*args).run
     end
 
   end

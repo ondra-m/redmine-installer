@@ -1,62 +1,112 @@
 require 'spec_helper'
 
-RSpec.describe Redmine::Installer::Upgrade do
+RSpec.describe RedmineInstaller::Upgrade, :install_first, command: 'upgrade' do
 
-  before(:example) do
-    @dir1 = Dir.mktmpdir
-    @dir2 = Dir.mktmpdir
+  it 'bad redmine root', args: [] do
+    FileUtils.remove_entry(File.join(@redmine_root, 'app'))
+    write(@redmine_root)
+
+    expected_output("Redmine #{@redmine_root} is not valid.")
   end
 
-  after(:example) do
-    FileUtils.remove_entry_secure(@dir1)
-    FileUtils.remove_entry_secure(@dir2)
+  it 'upgrading with full backup' do
+    test_test_dir = File.join(@redmine_root, 'test_test')
+    test_test_file = File.join(test_test_dir, 'test.txt')
+    FileUtils.mkdir_p(test_test_dir)
+    FileUtils.touch(test_test_file)
+
+    expect(File.exist?(test_test_file)).to be_truthy
+
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
+
+    expected_output('Path to package:')
+    write(package_v320)
+
+    expected_output('Extracting redmine package')
+    expected_output('Data backup')
+
+    expected_output('‣ Full (redmine root and database)')
+    select_choice
+
+    expected_output('Where to save backup:')
+    write(@backup_dir)
+
+    expected_output('Files backuping')
+    expected_output('Files backed up')
+    expected_output('Database backuping')
+    expected_output('Database backed up')
+
+    expected_successful_upgrade
+
+    expected_redmine_version('3.2.0')
+
+    expect(File.exist?(test_test_file)).to be_falsey
+
+    last_backup = Dir.glob(File.join(@backup_dir, '*')).sort.last
+    backuped = Dir.glob(File.join(last_backup, '*'))
+
+    expect(backuped.map{|f| File.zero?(f) }).to all(be_falsey)
   end
 
-  let(:package1) { LoadRedmine.get('2.4.7') }
-  let(:package2) { LoadRedmine.get('2.5.0') }
+  it 'upgrade with no backup and files keeping', args: ['--keep', 'test_test'] do
+    test_test_dir = File.join(@redmine_root, 'test_test')
+    test_test_file = File.join(test_test_dir, 'test.txt')
+    FileUtils.mkdir_p(test_test_dir)
+    FileUtils.touch(test_test_file)
 
-  context 'mysql' do
-    let(:host)     { RSpec.configuration.mysql[:host] }
-    let(:port)     { RSpec.configuration.mysql[:port] }
-    let(:username) { RSpec.configuration.mysql[:username] }
-    let(:password) { RSpec.configuration.mysql[:password] }
+    expect(File.exist?(test_test_file)).to be_truthy
 
-    before(:example) do
-      system("mysql -h #{host} --port #{port} -u #{username} -p#{password} -e 'drop database test1'")
-    end
+    wait_for_stdin_buffer
+    write(@redmine_root)
 
-    it 'install' do
-      # redmine root -> tempdir1
-      # type of db -> mysql
-      # database -> test1
-      # host -> configuration
-      # username -> configuration
-      # password -> configuration
-      # encoding -> utf8
-      # port -> configuration
-      # email configuration -> skip
-      # webserver -> skip
+    wait_for_stdin_buffer
+    write(package_v320)
 
-      allow($stdin).to receive(:gets).and_return(
-        @dir1, '1', 'test1', host, username, password, 'utf8', port, '999', '999'
-      )
+    wait_for_stdin_buffer
 
-      r_installer = Redmine::Installer::Install.new(package1, {})
-      expect { r_installer.run }.to_not raise_error
+    go_down
+    go_down
+    expected_output('‣ Nothing')
+    select_choice
 
+    expected_output('Are you sure you dont want backup?')
+    write('y')
 
-      # redmine root -> tempdir1
-      # backup -> backup
-      # backup dir -> tempdir2
-      # save steps -> yes
+    expected_successful_upgrade
 
-      allow($stdin).to receive(:gets).and_return(
-        @dir1, '2', @dir2, 'y'
-      )
+    expected_redmine_version('3.2.0')
 
-      r_upgrader = Redmine::Installer::Upgrade.new(package2, {})
-      expect { r_upgrader.run }.to_not raise_error
-    end
+    expect(File.exist?(test_test_file)).to be_truthy
+  end
+
+  it 'copy files with symlink ', args: ['--copy-files-with-symlink'] do
+    files_dir = File.join(@redmine_root, 'files')
+    files = (0..10).map {|i| File.join(files_dir, "file_#{i}.txt") }
+    FileUtils.touch(files)
+
+    wait_for_stdin_buffer
+    write(@redmine_root)
+
+    wait_for_stdin_buffer
+    write(package_v320)
+
+    wait_for_stdin_buffer
+
+    go_down
+    go_down
+    expected_output('‣ Nothing')
+    select_choice
+
+    expected_output('Are you sure you dont want backup?')
+    write('y')
+
+    expected_successful_upgrade
+
+    expected_redmine_version('3.2.0')
+
+    # Not bullet-prof but at least check if files are still there
+    expect(Dir.glob(File.join(files_dir, '*.txt')).sort).to eq(files.sort)
   end
 
 end

@@ -1,55 +1,45 @@
-##
-# Install redmine
-#
-# You can instal redmine package from archive or git.
-#
-# == Steps:
-# 1. Redmine root - where should be new redmine located
-# 2. Load package - extract package
-# 3. Database configuration - you can choose type of DB which you want to use
-# 4. Email sending configuration - email sending configuration
-# 5. Install - install commands are executed
-# 6. Moving redmine - redmine is moved from temporarily folder to given redmine_root
-# 7. Webserve configuration - generating webserver configuration
-#
-# == Usage:
-#
-# From archive::
-#   Supported archives are .zip and .tar.gz.
-# => 
-#   # minimal
-#   redmine upgrade PATH_TO_PACKAGE
-#
-#   # full
-#   redmine upgrade PATH_TO_PACKAGE --env ENV1,ENV2,ENV3
-#
-# From git::
-#   # minimal
-#   redmine upgrade GIT_REPO --source git
-#
-#   # full
-#   redmine upgrade GIT_REPO --source git --env ENV1,ENV2,ENV3
-#
-module Redmine::Installer
+module RedmineInstaller
   class Install < Task
 
-    STEPS = [
-      step::RedmineRoot,
-      step::LoadPackage,
-      step::DatabaseConfig,
-      step::EmailConfig,
-      step::Install,
-      step::MoveRedmine,
-      step::WebserverConfig
-    ]
+    def initialize(package, redmine_root, **options)
+      super(**options)
 
-    attr_accessor :package
+      @environment = Environment.new(self)
+      @package = Package.new(self, package)
+      @target_redmine = Redmine.new(self, redmine_root)
+      @temp_redmine = Redmine.new(self)
+    end
 
-    def initialize(package, options={})
-      self.package = package
-      super(options)
+    def up
+      @temp_redmine.valid_options
+      @environment.check
+      @target_redmine.ensure_and_valid_root
+      @package.ensure_and_valid_package
+      @package.extract
 
-      check_package
+      @temp_redmine.root = @package.redmine_root
+
+      @temp_redmine.create_database_yml
+      @temp_redmine.create_configuration_yml
+      @temp_redmine.install
+
+      print_title('Finishing installation')
+      ok('Cleaning root'){ @target_redmine.delete_root }
+      ok('Moving redmine to target directory'){ @target_redmine.move_from(@temp_redmine) }
+      ok('Cleanning up'){ @package.clean_up }
+      ok('Moving installer log'){ logger.move_to(@target_redmine, suffix: 'install') }
+
+      puts
+      puts pastel.bold('Redmine was installed')
+      logger.info('Redmine was installed')
+    end
+
+    def down
+      @temp_redmine.clean_up
+      @package.clean_up
+
+      puts
+      puts "(Log is located on #{pastel.bold(logger.path)})"
     end
 
   end

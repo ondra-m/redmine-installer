@@ -1,46 +1,134 @@
 require 'spec_helper'
 
-RSpec.describe Redmine::Installer::Install do
+RSpec.describe RedmineInstaller::Install, command: 'install' do
 
-  before(:example) do
-    @dir = Dir.mktmpdir
+  it 'bad permission', args: [] do
+    FileUtils.chmod(0000, @redmine_root)
+
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
+
+    expected_output('Redmine root contains inaccessible files')
+
+    FileUtils.chmod(0600, @redmine_root)
   end
 
-  after(:example) do
-    FileUtils.remove_entry_secure(@dir)
+  it 'non-existinig package', args: [] do
+    this_file = File.expand_path(File.join(File.dirname(__FILE__)))
+
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
+
+    expected_output('Path to package:')
+    write(this_file)
+
+    expected_output("File #{this_file} must have format: .zip, .gz, .tgz")
   end
 
-  let(:package1) { LoadRedmine.get('2.4.7') }
+  it 'non-existinig zip package', args: [] do
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
 
-  context 'mysql' do
-    let(:host)     { RSpec.configuration.mysql[:host] }
-    let(:port)     { RSpec.configuration.mysql[:port] }
-    let(:username) { RSpec.configuration.mysql[:username] }
-    let(:password) { RSpec.configuration.mysql[:password] }
+    expected_output('Path to package:')
+    write('aaa.zip')
 
-    before(:example) do
-      system("mysql -h #{host} --port #{port} -u #{username} -p#{password} -e 'drop database test1'")
-    end
+    expected_output("File doesn't exist")
+  end
 
-    it 'install' do
-      # redmine root -> temp dir
-      # type of db -> mysql
-      # database -> test1
-      # host -> configuration
-      # username -> configuration
-      # password -> configuration
-      # encoding -> utf8
-      # port -> configuration
-      # email configuration -> skip
-      # webserver -> skip
+  it 'install without arguments', args: [] do
+    regular_package = File.expand_path(File.join(File.dirname(__FILE__), '..', 'packages', 'redmine-3.1.0.zip'))
 
-      allow($stdin).to receive(:gets).and_return(
-        @dir, '1', 'test1', host, username, password, 'utf8', port, '999', '999'
-      )
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
 
-      r_installer = Redmine::Installer::Install.new(package1, {})
-      expect { r_installer.run }.to_not raise_error
-    end
+    expected_output('Path to package:')
+    write(regular_package)
+
+    expected_output('Extracting redmine package')
+
+    expected_successful_configuration
+    expected_successful_installation
+
+    expected_redmine_version('3.1.0')
+  end
+
+  it 'download redmine', args: ['v3.1.1'] do
+    expected_output('Path to redmine root:')
+    write(@redmine_root)
+
+    expected_output_in('Downloading http://www.redmine.org/releases/redmine-3.1.1.zip', 30)
+    expected_output('Extracting redmine package')
+
+    expected_successful_configuration
+    expected_successful_installation
+
+    expected_redmine_version('3.1.1')
+  end
+
+  it 'installing something else', args: [package_someting_else] do
+    write(@redmine_root)
+
+    expected_successful_configuration
+
+    expected_output('Redmine installing')
+    expected_output_in('--> Bundle install', 50)
+
+    expected_output("Gemfile.lock wasn't created")
+    expected_output('‣ Try again')
+
+    go_down
+    go_down
+    expected_output('‣ Cancel')
+    write(' ')
+
+    expected_output('Operation canceled by user')
+  end
+
+  it 'bad database settings', args: [package_v310] do
+    write(@redmine_root)
+
+    expected_output('Creating database configuration')
+    go_down
+    expected_output('‣ PostgreSQL')
+    write(' ')
+
+    write('test')
+    write('')
+    write('testtesttest')
+    sleep 0.5 # wait for buffer
+    write(db_password)
+    write('')
+    write('')
+
+    expected_output('Creating email configuration')
+    write(' ')
+
+    expected_output('Redmine installing')
+    expected_output_in('--> Database migrating', 60)
+    expected_output('Migration end with error')
+    expected_output('‣ Try again')
+
+    go_down
+    go_down
+    expected_output('‣ Change database configuration')
+    write(' ')
+
+    go_down
+    expected_output('‣ PostgreSQL')
+    write(' ')
+
+    write('test')
+    write('')
+    write(db_username)
+    sleep 0.5 # wait for buffer
+    write(db_password)
+    write('')
+    write('')
+
+    expected_output('--> Database migrating')
+    expected_output_in('Redmine was installed', 60)
+
+    expected_redmine_version('3.1.0')
   end
 
 end

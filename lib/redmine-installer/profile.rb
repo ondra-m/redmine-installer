@@ -1,73 +1,42 @@
-require 'fileutils'
+require 'ostruct'
 require 'yaml'
 
-module Redmine::Installer
-  class Profile
+module RedmineInstaller
+  class Profile < OpenStruct
+    PROFILES_FILE = File.join(Dir.home, '.redmine-installer-profiles.yml')
 
-    include Redmine::Installer::Utils
+    def self.get!(profile_id)
+      data = YAML.load_file(PROFILES_FILE) rescue nil
 
-    CONFIG_FILE = File.join(Dir.home, '.redmine-installer-profiles.yml')
-    
-    def self.save(task)
-      return unless check_writable
-      return unless confirm(:do_you_want_save_step_for_further_use, true)
-
-      profile = Profile.new(task)
-      profile.save
-
-      say t(:your_profile_can_be_used_as, id: profile.id), 2
+      if data.is_a?(Hash) && data.has_key?(profile_id)
+        Profile.new(profile_id, data[profile_id])
+      else
+        raise RedmineInstaller::ProfileError, "Profile ID=#{profile_id} does not exist"
+      end
     end
 
-    def self.load(task, id)
-      profile = Profile.new(task)
-      profile.load(id)
-    end
+    attr_reader :id
 
-    def self.check_writable
-      FileUtils.touch(CONFIG_FILE)
-      File.writable?(CONFIG_FILE)
-    end
-
-    attr_accessor :task
-
-    def initialize(task)
-      self.task = task
-
-      # Load profiles
-      @data = YAML.load_file(CONFIG_FILE) rescue nil
-
-      # Make empty Hash if there is no profiles
-      @data = {} unless @data.is_a?(Hash)
-    end
-
-    def id
-      @id ||= @data.keys.map(&:to_i).max.to_i + 1
+    def initialize(id=nil, data={})
+      super(data)
+      @id = id
     end
 
     def save
-      # All steps save configuration which can be use again
-      configuration = {}
-      task.steps.each do |_, step|
-        step.save(configuration)
-      end
+      FileUtils.touch(PROFILES_FILE)
 
-      @data[id] = configuration
+      all_data = YAML.load_file(PROFILES_FILE)
+      all_data = {} unless all_data.is_a?(Hash)
 
-      File.open(CONFIG_FILE, 'w') {|f| f.puts(YAML.dump(@data))}
-    end
+      @id ||= all_data.keys.last.to_i + 1
 
-    def load(id)
-      @id = id.to_i
+      all_data[@id] = to_h
 
-      configuration = @data[@id]
+      File.write(PROFILES_FILE, YAML.dump(all_data))
 
-      return {} if configuration.nil?
-
-      task.steps.each do |_, step|
-        step.load(configuration)
-      end
-
-      return configuration
+      puts "Profile was saved under ID=#{@id}"
+    rescue => e
+      puts "Profile could not be save due to #{e.message}"
     end
 
   end
